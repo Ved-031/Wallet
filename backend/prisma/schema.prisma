@@ -7,11 +7,33 @@ datasource db {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    clerkId   String   @unique
-    email     String   @unique
-    name      String?  @unique
-    avatar    String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id           Int           @id @default(autoincrement())
+    clerkId      String        @unique
+    email        String        @unique
+    name         String?       @unique
+    avatar       String?
+    transactions Transaction[]
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+
+    @@index([clerkId])
+}
+
+enum TransactionType {
+    INCOME
+    EXPENSE
+}
+
+model Transaction {
+    id        Int             @id @default(autoincrement())
+    userId    Int
+    user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    title     String
+    amount    Decimal
+    type      TransactionType
+    category  String?
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+
+    @@index([userId])
 }
