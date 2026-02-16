@@ -1,6 +1,6 @@
-import { prisma } from '../config/prisma.ts';
+import { prisma } from '../config/prisma';
 import { getAuth, requireAuth } from '@clerk/express';
-import { asyncHandler } from '../utils/AsyncHandler.ts';
+import { asyncHandler } from '../utils/AsyncHandler';
 import type { Request, Response, NextFunction } from 'express';
 
 export type AuthenticatedRequest = Request & {

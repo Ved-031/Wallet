@@ -1,12 +1,12 @@
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import job from './config/cron.ts';
-import routes from './routes/index.ts';
+import job from './config/cron';
+import routes from './routes/index';
 import { clerkMiddleware } from '@clerk/express';
-import rateLimiter from './middlewares/ratelimiter.middleware.ts';
+import rateLimiter from './middlewares/ratelimiter.middleware';
 import express, { type Application, type Response } from 'express';
-import { errorHandler, notFound } from './middlewares/error.middleware.ts';
+import { errorHandler, notFound } from './middlewares/error.middleware';
 
 const app: Application = express();
 

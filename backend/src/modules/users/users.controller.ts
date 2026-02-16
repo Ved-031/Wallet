@@ -1,8 +1,8 @@
-import { prisma } from '../../config/prisma.ts';
+import { prisma } from '../../config/prisma';
 import type { Request, Response } from 'express';
-import { AppError } from '../../utils/AppError.ts';
+import { AppError } from '../../utils/AppError';
 import { clerkClient, getAuth } from '@clerk/express';
-import { asyncHandler } from '../../utils/AsyncHandler.ts';
+import { asyncHandler } from '../../utils/AsyncHandler';
 
 export const authCallback = asyncHandler(async (req: Request, res: Response) => {
     const { userId: clerkId } = getAuth(req);

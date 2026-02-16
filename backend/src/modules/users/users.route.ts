@@ -1,5 +1,5 @@
 import express from 'express';
-import { authCallback } from './users.controller.ts';
+import { authCallback } from './users.controller';
 
 const router = express.Router();
 
