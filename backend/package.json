@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "nodemon src/server.ts",
         "start": "node dist/server.js",
-        "build": "tsc -b",
+        "build": "tsc",
         "format": "prettier --write src/**/*.js"
     },
     "_moduleAliases": {
