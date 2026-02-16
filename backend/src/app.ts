@@ -3,7 +3,6 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import job from './config/cron';
 import routes from './routes/index';
-import { clerkMiddleware } from '@clerk/express';
 import rateLimiter from './middlewares/ratelimiter.middleware';
 import express, { type Application, type Response } from 'express';
 import { errorHandler, notFound } from './middlewares/error.middleware';
@@ -15,7 +14,6 @@ app.use(helmet());
 app.use(rateLimiter);
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: true }));
 
 job.start();
