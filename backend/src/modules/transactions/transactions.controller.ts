@@ -4,6 +4,35 @@ import { asyncHandler } from '../../utils/AsyncHandler';
 import { transactionService } from './transactions.service';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
+/**
+ * @swagger
+ * /transactions:
+ *   post:
+ *     summary: Create a personal transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, amount, type]
+ *             properties:
+ *               title:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               type:
+ *                 type: string
+ *                 enum: [INCOME, EXPENSE]
+ *               category:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Transaction created
+ */
 export const createTransaction = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
 
@@ -17,6 +46,28 @@ export const createTransaction = asyncHandler(async (req: AuthenticatedRequest, 
     );
 });
 
+/**
+ * @swagger
+ * /transactions:
+ *   get:
+ *     summary: Get paginated transactions
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *         description: Last transaction createdAt
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: List of transactions
+ */
 export const getTransactions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
 
@@ -34,6 +85,24 @@ export const getTransactions = asyncHandler(async (req: AuthenticatedRequest, re
     );
 });
 
+/**
+ * @swagger
+ * /transactions/{id}:
+ *   patch:
+ *     summary: Update a transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Transaction updated
+ */
 export const updateTransaction = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
     const id = Number(req.params.id);
@@ -48,6 +117,24 @@ export const updateTransaction = asyncHandler(async (req: AuthenticatedRequest, 
     );
 });
 
+/**
+ * @swagger
+ * /transactions/{id}:
+ *   delete:
+ *     summary: Delete a transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Transaction deleted
+ */
 export const deleteTransaction = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
     const id = Number(req.params.id);
@@ -62,6 +149,18 @@ export const deleteTransaction = asyncHandler(async (req: AuthenticatedRequest, 
     );
 });
 
+/**
+ * @swagger
+ * /transactions/summary:
+ *   get:
+ *     summary: Get income expense summary
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Summary retrieved
+ */
 export const getSummary = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
 

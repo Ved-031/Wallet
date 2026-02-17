@@ -4,6 +4,23 @@ import { analyticsService } from './analytics.service';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
+/**
+ * @swagger
+ * /analytics/monthly:
+ *   get:
+ *     summary: Monthly spending graph
+ *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: year
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Monthly analytics data
+ */
 export const getMonthlyAnalytics = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
         const year = Number(req.query.year) || new Date().getFullYear();
@@ -15,6 +32,27 @@ export const getMonthlyAnalytics = asyncHandler(
     },
 );
 
+/**
+ * @swagger
+ * /analytics/category:
+ *   get:
+ *     summary: Category spending breakdown
+ *     tags: [Analytics]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: year
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Category analytics
+ */
 export const getCategoryAnalytics = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
         const userId = req.user!.id;

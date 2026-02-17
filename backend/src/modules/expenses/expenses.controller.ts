@@ -5,6 +5,42 @@ import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 import { saveIdempotentResponse } from '../../utils/SaveIdempotentResponse';
 
+/**
+ * @swagger
+ * /expenses:
+ *   post:
+ *     summary: Create a group expense (equal or unequal split)
+ *     tags: [Expenses]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [groupId, amount, participants]
+ *             properties:
+ *               groupId:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               participants:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required: [userId, share]
+ *                   properties:
+ *                     userId:
+ *                       type: number
+ *                     share:
+ *                       type: number
+ *     responses:
+ *       201:
+ *         description: Expense created
+ */
 export const createExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
 
@@ -31,6 +67,32 @@ export const createExpense = asyncHandler(async (req: AuthenticatedRequest, res:
     res.status(201).json(response);
 });
 
+/**
+ * @swagger
+ * /expenses/group/{groupId}:
+ *   get:
+ *     summary: Get expenses of a group (paginated)
+ *     tags: [Expenses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Group expenses list
+ */
 export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
     const groupId = Number(req.params.groupId);
@@ -49,20 +111,24 @@ export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, r
     );
 });
 
-export const deleteExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const currentUserId = req.user!.id;
-    const expenseId = Number(req.params.id);
-
-    await expensesService.deleteExpense(currentUserId, expenseId);
-
-    res.status(200).json(
-        new ApiResponse({
-            success: true,
-            message: 'Expense deleted successfully',
-        }),
-    );
-});
-
+/**
+ * @swagger
+ * /expenses/{expenseId}:
+ *   patch:
+ *     summary: Update expense (only payer allowed)
+ *     tags: [Expenses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: expenseId
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Expense updated
+ */
 export const updateExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
     const expenseId = Number(req.params.id);
@@ -83,6 +149,38 @@ export const updateExpense = asyncHandler(async (req: AuthenticatedRequest, res:
         new ApiResponse({
             data: expense,
             success: true,
+        }),
+    );
+});
+
+/**
+ * @swagger
+ * /expenses/{expenseId}:
+ *   delete:
+ *     summary: Delete expense (only payer allowed)
+ *     tags: [Expenses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: expenseId
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Expense deleted
+ */
+export const deleteExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const currentUserId = req.user!.id;
+    const expenseId = Number(req.params.id);
+
+    await expensesService.deleteExpense(currentUserId, expenseId);
+
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            message: 'Expense deleted successfully',
         }),
     );
 });

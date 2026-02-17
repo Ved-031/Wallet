@@ -4,6 +4,18 @@ import { asyncHandler } from '../../utils/AsyncHandler';
 import { notificationsService } from './notifications.service';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
+/**
+ * @swagger
+ * /notifications:
+ *   get:
+ *     summary: Get user notifications
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Notifications list
+ */
 export const getMyNotifications = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
 
@@ -17,6 +29,24 @@ export const getMyNotifications = asyncHandler(async (req: AuthenticatedRequest,
     );
 });
 
+/**
+ * @swagger
+ * /notifications/{id}/read:
+ *   patch:
+ *     summary: Mark notification as read
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Notification marked as read
+ */
 export const markNotificationRead = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
         const userId = req.user!.id;
@@ -33,6 +63,18 @@ export const markNotificationRead = asyncHandler(
     },
 );
 
+/**
+ * @swagger
+ * /notifications/read-all:
+ *   patch:
+ *     summary: Mark all notifications as read
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All notifications marked as read
+ */
 export const markAllNotificationsRead = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
         const userId = req.user!.id;

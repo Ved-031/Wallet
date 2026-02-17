@@ -4,6 +4,30 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
+/**
+ * @swagger
+ * /invites:
+ *   post:
+ *     summary: Send group invite using email
+ *     tags: [Invites]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [groupId, email]
+ *             properties:
+ *               groupId:
+ *                 type: number
+ *               email:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Invite sent
+ */
 export const sendInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
     const groupId = Number(req.params.groupId);
@@ -19,6 +43,18 @@ export const sendInvite = asyncHandler(async (req: AuthenticatedRequest, res: Re
     );
 });
 
+/**
+ * @swagger
+ * /invites:
+ *   get:
+ *     summary: Get pending invites
+ *     tags: [Invites]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of pending invites
+ */
 export const getMyInvites = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
 
@@ -32,6 +68,24 @@ export const getMyInvites = asyncHandler(async (req: AuthenticatedRequest, res: 
     );
 });
 
+/**
+ * @swagger
+ * /invites/{inviteId}/accept:
+ *   post:
+ *     summary: Accept a group invite
+ *     tags: [Invites]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: inviteId
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Joined group
+ */
 export const acceptInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
     const inviteId = Number(req.params.inviteId);
@@ -47,6 +101,24 @@ export const acceptInvite = asyncHandler(async (req: AuthenticatedRequest, res: 
     );
 });
 
+/**
+ * @swagger
+ * /invites/{inviteId}/decline:
+ *   post:
+ *     summary: Decline a group invite
+ *     tags: [Invites]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: inviteId
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Invite declined
+ */
 export const declineInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
     const inviteId = Number(req.params.inviteId);

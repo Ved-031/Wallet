@@ -5,6 +5,20 @@ import { AppError } from '../../utils/AppError';
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/AsyncHandler';
 
+/**
+ * @swagger
+ * /user/callback:
+ *   post:
+ *     summary: Sync logged-in Clerk user with database
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User synced successfully
+ *       401:
+ *         description: Unauthenticated
+ */
 export const authCallback = asyncHandler(async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization;
 
