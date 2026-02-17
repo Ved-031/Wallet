@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from '../modules/users/users.route';
 import groupRoutes from '../modules/groups/groups.routes';
+import balanceRoutes from '../modules/balance/balance.routes';
 import expenseRoutes from '../modules/expenses/expenses.routes';
 import settlementRoutes from '../modules/settlements/settlements.routes';
 import transactionRoutes from '../modules/transactions/transactions.route';
@@ -12,5 +13,6 @@ router.use('/transactions', transactionRoutes);
 router.use('/groups', groupRoutes);
 router.use('/expenses', expenseRoutes);
 router.use('/settlements', settlementRoutes);
+router.use('/balance', balanceRoutes);
 
 export default router;
