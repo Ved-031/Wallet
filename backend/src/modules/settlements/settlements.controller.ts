@@ -30,12 +30,20 @@ export const getGroupSettlements = asyncHandler(
         const currentUserId = req.user!.id;
         const groupId = Number(req.params.groupId);
 
-        const settlements = await settlementsService.getGroupSettlements(currentUserId, groupId);
+        const result = await settlementsService.getGroupSettlements(
+            currentUserId,
+            groupId,
+            req.query,
+        );
 
         res.status(200).json(
             new ApiResponse({
                 success: true,
-                data: settlements,
+                data: result.settlements,
+                meta: {
+                    nextCursor: result.nextCursor,
+                    hasMore: result.hasMore,
+                },
             }),
         );
     },

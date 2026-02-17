@@ -30,12 +30,16 @@ export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, r
     const currentUserId = req.user!.id;
     const groupId = Number(req.params.groupId);
 
-    const expenses = await expensesService.getGroupExpenses(currentUserId, groupId);
+    const result = await expensesService.getGroupExpenses(currentUserId, groupId, req.query);
 
     res.status(200).json(
         new ApiResponse({
             success: true,
-            data: expenses,
+            data: result.expenses,
+            meta: {
+                nextCursor: result.nextCursor,
+                hasMore: result.hasMore,
+            },
         }),
     );
 });

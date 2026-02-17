@@ -33,13 +33,25 @@ export const settlementsService = {
         );
     },
 
-    async getGroupSettlements(currentUserId: number, groupId: number) {
+    async getGroupSettlements(currentUserId: number, groupId: number, query: any) {
         const members = await settlementsRepository.getGroupMembers(groupId);
         const memberIds = new Set(members.map(m => m.userId));
 
         if (!memberIds.has(currentUserId))
             throw new AppError('You are not part of this group', 403);
 
-        return settlementsRepository.getGroupSettlements(groupId);
+        const limit = Math.min(Number(query.limit) || 20, 50);
+        const cursor = query.cursor ? new Date(query.cursor) : undefined;
+
+        const settlements = await settlementsRepository.getGroupSettlements(groupId, cursor, limit);
+
+        const nextCursor =
+            settlements.length === limit ? settlements[settlements.length - 1].createdAt : null;
+
+        return {
+            settlements,
+            nextCursor,
+            hasMore: !!nextCursor,
+        };
     },
 };

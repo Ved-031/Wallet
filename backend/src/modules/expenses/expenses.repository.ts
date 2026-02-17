@@ -37,10 +37,18 @@ export const expensesRepository = {
         });
     },
 
-    async getGroupExpenses(groupId: number) {
+    async getGroupExpenses(groupId: number, cursor?: Date, limit = 20) {
         return prisma.expense.findMany({
-            where: { groupId },
+            where: {
+                groupId,
+                ...(cursor && {
+                    createdAt: {
+                        lt: cursor,
+                    },
+                }),
+            },
             orderBy: { createdAt: 'desc' },
+            take: limit,
             include: {
                 payer: {
                     select: { id: true, name: true, email: true, avatar: true },

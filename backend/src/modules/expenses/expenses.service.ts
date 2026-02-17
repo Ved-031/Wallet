@@ -61,14 +61,26 @@ export const expensesService = {
         );
     },
 
-    async getGroupExpenses(currentUserId: number, groupId: number) {
+    async getGroupExpenses(currentUserId: number, groupId: number, query: any) {
         const members = await expensesRepository.getGroupMembers(groupId);
         const memberIds = new Set(members.map(m => m.userId));
 
         if (!memberIds.has(currentUserId))
             throw new AppError('You are not part of this group', 403);
 
-        return expensesRepository.getGroupExpenses(groupId);
+        const limit = Math.min(Number(query.limit) || 20, 50);
+        const cursor = query.cursor ? new Date(query.cursor) : undefined;
+
+        const expenses = await expensesRepository.getGroupExpenses(groupId, cursor, limit);
+
+        const nextCursor =
+            expenses.length === limit ? expenses[expenses.length - 1].createdAt : null;
+
+        return {
+            expenses,
+            nextCursor,
+            hasMore: !!nextCursor,
+        };
     },
 
     async deleteExpense(currentUserId: number, expenseId: number) {
