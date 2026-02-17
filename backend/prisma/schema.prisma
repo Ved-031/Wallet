@@ -7,14 +7,16 @@ datasource db {
 }
 
 model User {
-    id           Int           @id @default(autoincrement())
-    clerkId      String        @unique
-    email        String        @unique
-    name         String?       @unique
-    avatar       String?
-    transactions Transaction[]
-    createdAt    DateTime      @default(now())
-    updatedAt    DateTime      @updatedAt
+    id            Int           @id @default(autoincrement())
+    clerkId       String        @unique
+    email         String        @unique
+    name          String?
+    avatar        String?
+    transactions  Transaction[]
+    groupsCreated Group[]       @relation("GroupCreator")
+    groupMembers  GroupMember[]
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
 
     @@index([clerkId])
 }
@@ -36,4 +38,29 @@ model Transaction {
     updatedAt DateTime        @updatedAt
 
     @@index([userId])
+}
+
+model Group {
+    id        Int           @id @default(autoincrement())
+    name      String
+    createdBy Int
+    creator   User          @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+    members   GroupMember[]
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+}
+
+enum GroupRole {
+    ADMIN
+    MEMBER
+}
+
+model GroupMember {
+    userId  Int
+    groupId Int
+    role    GroupRole @default(MEMBER)
+    user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    group   Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    @@id([userId, groupId])
 }
