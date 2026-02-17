@@ -1,5 +1,6 @@
 import { AppError } from '../../utils/AppError';
 import { groupRepository } from './groups.repository';
+import { balanceService } from '../balance/balance.service';
 
 export const groupService = {
     async createGroup(userId: number, name: string) {
@@ -36,5 +37,40 @@ export const groupService = {
         }
 
         return group;
+    },
+
+    async leaveGroup(currentUserId: number, groupId: number) {
+        const balances = await balanceService.getGroupBalances(currentUserId, groupId);
+
+        const me = balances.find(b => b.userId === currentUserId);
+
+        if (!me) throw new AppError('You are not part of this group', 404);
+
+        if (me.balance !== 0)
+            throw new AppError('You cannot leave group until all debts are settled', 400);
+
+        await groupRepository.removeMember(groupId, currentUserId);
+
+        return { message: 'You left the group' };
+    },
+
+    async removeMember(currentUserId: number, groupId: number, targetUserId: number) {
+        const group = await groupRepository.findGroupById(groupId);
+        if (!group) throw new AppError('Group not found', 404);
+
+        const me = group.members.find(m => m.userId === currentUserId);
+        if (!me || me.role !== 'ADMIN') throw new AppError('Only admin can remove members', 403);
+
+        const balances = await balanceService.getGroupBalances(currentUserId, groupId);
+        const target = balances.find(b => b.userId === targetUserId);
+
+        if (!target) throw new AppError('User not in group', 404);
+
+        if (target.balance !== 0)
+            throw new AppError('Cannot remove user with pending balances', 400);
+
+        await groupRepository.removeMember(groupId, targetUserId);
+
+        return { message: 'Member removed successfully' };
     },
 };

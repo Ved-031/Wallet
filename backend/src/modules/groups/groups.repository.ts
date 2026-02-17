@@ -43,4 +43,12 @@ export const groupRepository = {
             },
         });
     },
+
+    async removeMember(groupId: number, userId: number) {
+        return prisma.groupMember.delete({
+            where: {
+                userId_groupId: { userId, groupId },
+            },
+        });
+    },
 };

@@ -37,3 +37,28 @@ export const getGroupDetails = asyncHandler(async (req: AuthenticatedRequest, re
         data: group,
     });
 });
+
+export const leaveGroup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const currentUserId = req.user!.id;
+    const groupId = Number(req.params.groupId);
+
+    const result = await groupService.leaveGroup(currentUserId, groupId);
+
+    res.status(200).json({
+        success: true,
+        ...result,
+    });
+});
+
+export const removeMember = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const currentUserId = req.user!.id;
+    const groupId = Number(req.params.groupId);
+    const targetUserId = Number(req.params.userId);
+
+    const result = await groupService.removeMember(currentUserId, groupId, targetUserId);
+
+    res.status(200).json({
+        success: true,
+        ...result,
+    });
+});
