@@ -19,6 +19,9 @@ model User {
     expenseParticipants ExpenseParticipant[]
     sentSettlements     Settlement[]         @relation("SettlementPayer")
     receivedSettlements Settlement[]         @relation("SettlementReceiver")
+    sentInvites         GroupInvite[]        @relation("SentInvites")
+    receivedInvites     GroupInvite[]        @relation("ReceivedInvites")
+    notifications       Notification[]
     createdAt           DateTime             @default(now())
     updatedAt           DateTime             @updatedAt
 
@@ -52,6 +55,7 @@ model Group {
     members     GroupMember[]
     expenses    Expense[]
     settlements Settlement[]
+    invites     GroupInvite[]
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
 }
@@ -111,4 +115,42 @@ model Settlement {
     updatedAt DateTime @updatedAt
 
     @@index([groupId])
+}
+
+model GroupInvite {
+    id            Int          @id @default(autoincrement())
+    groupId       Int
+    invitedBy     Int
+    invitedUserId Int
+    status        InviteStatus @default(PENDING)
+    group         Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    inviter       User         @relation("SentInvites", fields: [invitedBy], references: [id])
+    invited       User         @relation("ReceivedInvites", fields: [invitedUserId], references: [id])
+    createdAt     DateTime     @default(now())
+
+    @@unique([groupId, invitedUserId])
+}
+
+enum InviteStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+}
+
+model Notification {
+    id        Int              @id @default(autoincrement())
+    userId    Int
+    type      NotificationType
+    title     String
+    message   String
+    read      Boolean          @default(false)
+    user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+    GROUP_INVITE
+    INVITE_ACCEPTED
+    INVITE_DECLINED
+    SETTLEMENT
 }
