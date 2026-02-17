@@ -1,5 +1,6 @@
 import type { Response } from 'express';
 import { invitesService } from './invites.service';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
@@ -10,10 +11,12 @@ export const sendInvite = asyncHandler(async (req: AuthenticatedRequest, res: Re
 
     const result = await invitesService.sendInvite(currentUserId, groupId, email);
 
-    res.status(200).json({
-        success: true,
-        ...result,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            ...result,
+        }),
+    );
 });
 
 export const getMyInvites = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -21,10 +24,12 @@ export const getMyInvites = asyncHandler(async (req: AuthenticatedRequest, res: 
 
     const invites = await invitesService.getMyInvites(currentUserId);
 
-    res.status(200).json({
-        success: true,
-        data: invites,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: invites,
+        }),
+    );
 });
 
 export const acceptInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -33,11 +38,13 @@ export const acceptInvite = asyncHandler(async (req: AuthenticatedRequest, res: 
 
     const invite = await invitesService.acceptInvite(currentUserId, inviteId);
 
-    res.status(200).json({
-        success: true,
-        message: 'Joined group successfully',
-        data: invite,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            message: 'Joined group successfully',
+            data: invite,
+        }),
+    );
 });
 
 export const declineInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -46,9 +53,11 @@ export const declineInvite = asyncHandler(async (req: AuthenticatedRequest, res:
 
     const invite = await invitesService.declineInvite(currentUserId, inviteId);
 
-    res.status(200).json({
-        success: true,
-        message: 'Invite declined',
-        data: invite,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            message: 'Invite declined',
+            data: invite,
+        }),
+    );
 });

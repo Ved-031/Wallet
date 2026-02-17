@@ -1,4 +1,5 @@
 import type { Response } from 'express';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { notificationsService } from './notifications.service';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
@@ -8,10 +9,12 @@ export const getMyNotifications = asyncHandler(async (req: AuthenticatedRequest,
 
     const notifications = await notificationsService.getMyNotifications(userId);
 
-    res.status(200).json({
-        success: true,
-        data: notifications,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: notifications,
+        }),
+    );
 });
 
 export const markNotificationRead = asyncHandler(
@@ -21,10 +24,12 @@ export const markNotificationRead = asyncHandler(
 
         const result = await notificationsService.markAsRead(userId, id);
 
-        res.status(200).json({
-            success: true,
-            ...result,
-        });
+        res.status(200).json(
+            new ApiResponse({
+                success: true,
+                ...result,
+            }),
+        );
     },
 );
 
@@ -34,9 +39,11 @@ export const markAllNotificationsRead = asyncHandler(
 
         const result = await notificationsService.markAllAsRead(userId);
 
-        res.status(200).json({
-            success: true,
-            ...result,
-        });
+        res.status(200).json(
+            new ApiResponse({
+                success: true,
+                ...result,
+            }),
+        );
     },
 );

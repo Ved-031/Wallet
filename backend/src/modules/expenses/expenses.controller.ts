@@ -1,5 +1,6 @@
 import type { Response } from 'express';
 import { expensesService } from './expenses.service';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
@@ -17,10 +18,12 @@ export const createExpense = asyncHandler(async (req: AuthenticatedRequest, res:
         splits,
     );
 
-    res.status(201).json({
-        success: true,
-        data: expense,
-    });
+    res.status(201).json(
+        new ApiResponse({
+            success: true,
+            data: expense,
+        }),
+    );
 });
 
 export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -29,10 +32,12 @@ export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, r
 
     const expenses = await expensesService.getGroupExpenses(currentUserId, groupId);
 
-    res.status(200).json({
-        success: true,
-        data: expenses,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: expenses,
+        }),
+    );
 });
 
 export const deleteExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -41,10 +46,12 @@ export const deleteExpense = asyncHandler(async (req: AuthenticatedRequest, res:
 
     await expensesService.deleteExpense(currentUserId, expenseId);
 
-    res.status(200).json({
-        success: true,
-        message: 'Expense deleted successfully',
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            message: 'Expense deleted successfully',
+        }),
+    );
 });
 
 export const updateExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -63,8 +70,10 @@ export const updateExpense = asyncHandler(async (req: AuthenticatedRequest, res:
         splits,
     );
 
-    res.status(200).json({
-        success: true,
-        data: expense,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            data: expense,
+            success: true,
+        }),
+    );
 });

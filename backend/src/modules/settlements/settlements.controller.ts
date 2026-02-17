@@ -1,4 +1,5 @@
 import type { Response } from 'express';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { settlementsService } from './settlements.service';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
@@ -16,10 +17,12 @@ export const createSettlement = asyncHandler(async (req: AuthenticatedRequest, r
         note,
     );
 
-    res.status(201).json({
-        success: true,
-        data: settlement,
-    });
+    res.status(201).json(
+        new ApiResponse({
+            success: true,
+            data: settlement,
+        }),
+    );
 });
 
 export const getGroupSettlements = asyncHandler(
@@ -29,9 +32,11 @@ export const getGroupSettlements = asyncHandler(
 
         const settlements = await settlementsService.getGroupSettlements(currentUserId, groupId);
 
-        res.status(200).json({
-            success: true,
-            data: settlements,
-        });
+        res.status(200).json(
+            new ApiResponse({
+                success: true,
+                data: settlements,
+            }),
+        );
     },
 );

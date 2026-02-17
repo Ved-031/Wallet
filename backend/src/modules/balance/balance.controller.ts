@@ -1,5 +1,6 @@
 import type { Response } from 'express';
 import { balanceService } from './balance.service';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
@@ -9,8 +10,10 @@ export const getGroupBalances = asyncHandler(async (req: AuthenticatedRequest, r
 
     const balances = await balanceService.getGroupBalances(currentUserId, groupId);
 
-    res.status(200).json({
-        success: true,
-        data: balances,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: balances,
+        })
+    );
 });

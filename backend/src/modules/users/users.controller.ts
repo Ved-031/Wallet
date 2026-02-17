@@ -1,9 +1,9 @@
-import { prisma } from '../../config/prisma';
-import type { Request, Response } from 'express';
-import { AppError } from '../../utils/AppError';
-import { asyncHandler } from '../../utils/AsyncHandler';
-import { verifyToken } from '@clerk/backend';
 import { clerk } from '../../config/clerk';
+import { prisma } from '../../config/prisma';
+import { verifyToken } from '@clerk/backend';
+import { AppError } from '../../utils/AppError';
+import type { Request, Response } from 'express';
+import { asyncHandler } from '../../utils/AsyncHandler';
 
 export const authCallback = asyncHandler(async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization;

@@ -1,5 +1,6 @@
 import type { Response } from 'express';
 import { groupService } from './groups.service';
+import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
@@ -9,10 +10,12 @@ export const createGroup = asyncHandler(async (req: AuthenticatedRequest, res: R
 
     const group = await groupService.createGroup(userId, name);
 
-    res.status(201).json({
-        success: true,
-        data: group,
-    });
+    res.status(201).json(
+        new ApiResponse({
+            success: true,
+            data: group,
+        }),
+    );
 });
 
 export const getMyGroups = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -20,10 +23,12 @@ export const getMyGroups = asyncHandler(async (req: AuthenticatedRequest, res: R
 
     const groups = await groupService.getUserGroups(userId);
 
-    res.status(200).json({
-        success: true,
-        data: groups,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: groups,
+        }),
+    );
 });
 
 export const getGroupDetails = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -32,10 +37,12 @@ export const getGroupDetails = asyncHandler(async (req: AuthenticatedRequest, re
 
     const group = await groupService.getGroupDetails(userId, groupId);
 
-    res.status(200).json({
-        success: true,
-        data: group,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: group,
+        }),
+    );
 });
 
 export const leaveGroup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -44,10 +51,12 @@ export const leaveGroup = asyncHandler(async (req: AuthenticatedRequest, res: Re
 
     const result = await groupService.leaveGroup(currentUserId, groupId);
 
-    res.status(200).json({
-        success: true,
-        ...result,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            ...result,
+        }),
+    );
 });
 
 export const removeMember = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -57,8 +66,10 @@ export const removeMember = asyncHandler(async (req: AuthenticatedRequest, res: 
 
     const result = await groupService.removeMember(currentUserId, groupId, targetUserId);
 
-    res.status(200).json({
-        success: true,
-        ...result,
-    });
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            ...result,
+        }),
+    );
 });
