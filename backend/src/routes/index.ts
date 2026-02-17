@@ -4,6 +4,8 @@ import groupRoutes from '../modules/groups/groups.routes';
 import inviteRoutes from '../modules/invites/invites.routes';
 import balanceRoutes from '../modules/balance/balance.routes';
 import expenseRoutes from '../modules/expenses/expenses.routes';
+import analyticsRoutes from '../modules/analytics/analytics.routes';
+import dashboardRoutes from '../modules/dashboards/dashboard.routes';
 import settlementRoutes from '../modules/settlements/settlements.routes';
 import transactionRoutes from '../modules/transactions/transactions.route';
 import notificationRoutes from '../modules/notifications/notifications.routes';
@@ -18,5 +20,7 @@ router.use('/settlements', settlementRoutes);
 router.use('/balance', balanceRoutes);
 router.use('/invites', inviteRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/analytics', analyticsRoutes);
 
 export default router;
