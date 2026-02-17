@@ -1,5 +1,5 @@
-import { balanceRepository } from './balance.repository';
 import { AppError } from '../../utils/AppError';
+import { balanceRepository } from './balance.repository';
 
 export const balanceService = {
     async getGroupBalances(currentUserId: number, groupId: number) {
