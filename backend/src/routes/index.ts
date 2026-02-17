@@ -6,6 +6,7 @@ import balanceRoutes from '../modules/balance/balance.routes';
 import expenseRoutes from '../modules/expenses/expenses.routes';
 import settlementRoutes from '../modules/settlements/settlements.routes';
 import transactionRoutes from '../modules/transactions/transactions.route';
+import notificationRoutes from '../modules/notifications/notifications.routes';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use('/expenses', expenseRoutes);
 router.use('/settlements', settlementRoutes);
 router.use('/balance', balanceRoutes);
 router.use('/invites', inviteRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;
