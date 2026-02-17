@@ -20,12 +20,16 @@ export const createTransaction = asyncHandler(async (req: AuthenticatedRequest, 
 export const getTransactions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
 
-    const transactions = await transactionService.getAll(userId);
+    const result = await transactionService.getAll(userId, req.query);
 
     res.status(200).json(
         new ApiResponse({
             success: true,
-            data: transactions,
+            data: result.transactions,
+            meta: {
+                nextCursor: result.nextCursor,
+                hasMore: result.hasMore,
+            },
         }),
     );
 });

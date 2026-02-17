@@ -17,8 +17,20 @@ export const transactionService = {
         });
     },
 
-    async getAll(userId: number) {
-        return transactionRepository.findAllByUser(userId);
+    async getAll(userId: number, query: any) {
+        const limit = Math.min(Number(query.limit) || 20, 50);
+        const cursor = query.cursor ? new Date(query.cursor) : undefined;
+
+        const transactions = await transactionRepository.findPaginatedByUser(userId, cursor, limit);
+
+        const nextCursor =
+            transactions.length === limit ? transactions[transactions.length - 1].createdAt : null;
+
+        return {
+            transactions,
+            nextCursor,
+            hasMore: !!nextCursor,
+        };
     },
 
     async update(userId: number, id: number, data: Partial<CreateTransactionDto>) {

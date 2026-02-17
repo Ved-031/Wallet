@@ -77,4 +77,21 @@ export const transactionRepository = {
             balance: income - expense,
         };
     },
+
+    async findPaginatedByUser(userId: number, cursor?: Date, limit: number = 20) {
+        return prisma.transaction.findMany({
+            where: {
+                userId,
+                ...(cursor && {
+                    createdAt: {
+                        lt: cursor,
+                    },
+                }),
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: limit,
+        });
+    },
 };
