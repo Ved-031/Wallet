@@ -17,6 +17,8 @@ model User {
     groupMembers        GroupMember[]
     paidExpenses        Expense[]            @relation("ExpensePayer")
     expenseParticipants ExpenseParticipant[]
+    sentSettlements     Settlement[]         @relation("SettlementPayer")
+    receivedSettlements Settlement[]         @relation("SettlementReceiver")
     createdAt           DateTime             @default(now())
     updatedAt           DateTime             @updatedAt
 
@@ -43,14 +45,15 @@ model Transaction {
 }
 
 model Group {
-    id        Int           @id @default(autoincrement())
-    name      String
-    createdBy Int
-    creator   User          @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
-    members   GroupMember[]
-    expenses  Expense[]
-    createdAt DateTime      @default(now())
-    updatedAt DateTime      @updatedAt
+    id          Int           @id @default(autoincrement())
+    name        String
+    createdBy   Int
+    creator     User          @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+    members     GroupMember[]
+    expenses    Expense[]
+    settlements Settlement[]
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
 }
 
 enum GroupRole {
@@ -92,4 +95,20 @@ model ExpenseParticipant {
     user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@id([expenseId, userId])
+}
+
+model Settlement {
+    id        Int      @id @default(autoincrement())
+    groupId   Int
+    paidBy    Int
+    paidTo    Int
+    amount    Decimal
+    note      String?
+    group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    payer     User     @relation("SettlementPayer", fields: [paidBy], references: [id])
+    receiver  User     @relation("SettlementReceiver", fields: [paidTo], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([groupId])
 }
