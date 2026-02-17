@@ -3,6 +3,7 @@ import { expensesService } from './expenses.service';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
+import { saveIdempotentResponse } from '../../utils/SaveIdempotentResponse';
 
 export const createExpense = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
@@ -18,12 +19,16 @@ export const createExpense = asyncHandler(async (req: AuthenticatedRequest, res:
         splits,
     );
 
-    res.status(201).json(
-        new ApiResponse({
-            success: true,
-            data: expense,
-        }),
-    );
+    const response = new ApiResponse({
+        message: 'Expense created',
+        data: expense,
+    });
+
+    if (res.locals.idempotencyKey) {
+        await saveIdempotentResponse(res.locals.idempotencyKey, currentUserId, response);
+    }
+
+    res.status(201).json(response);
 });
 
 export const getGroupExpenses = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
