@@ -92,3 +92,24 @@ export const getDashboardActivity = asyncHandler(
         );
     },
 );
+
+/**
+ * @swagger
+ * /dashboard/groups-preview:
+ *   get:
+ *     summary: Get quick preview of user groups
+ *     tags: [Dashboard]
+ *     security:
+ *       - bearerAuth: []
+ */
+export const getGroupsPreview = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.id;
+
+    const groups = await dashboardService.getGroupsPreview(userId);
+
+    res.status(200).json(
+        new ApiResponse({
+            data: groups,
+        }),
+    );
+});

@@ -179,4 +179,8 @@ export const dashboardService = {
             hasMore: feed.length > limit,
         };
     },
+
+    async getGroupsPreview(userId: number) {
+        return dashboardRepository.getGroupsPreview(userId);
+    },
 };

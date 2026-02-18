@@ -166,4 +166,98 @@ export const dashboardRepository = {
             },
         });
     },
+
+    async getGroupsPreview(userId: number) {
+        // 1. Get groups user belongs to
+        const memberships = await prisma.groupMember.findMany({
+            where: { userId },
+            select: {
+                group: {
+                    select: {
+                        id: true,
+                        name: true,
+                        members: {
+                            select: {
+                                user: {
+                                    select: { avatar: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const groupIds = memberships.map(m => m.group.id);
+
+        if (!groupIds.length) return [];
+
+        // 2. Get all expense shares involving user
+        const shares = await prisma.expenseParticipant.findMany({
+            where: {
+                expense: { groupId: { in: groupIds } },
+            },
+            select: {
+                userId: true,
+                share: true,
+                paidShare: true,
+                expense: {
+                    select: {
+                        groupId: true,
+                        paidBy: true,
+                    },
+                },
+            },
+        });
+
+        // 3. Get settlements
+        const settlements = await prisma.settlement.findMany({
+            where: {
+                groupId: { in: groupIds },
+                OR: [{ paidBy: userId }, { paidTo: userId }],
+            },
+            select: {
+                groupId: true,
+                paidBy: true,
+                paidTo: true,
+                amount: true,
+            },
+        });
+
+        // 4. Calculate balances
+        const balances: Record<number, number> = {};
+
+        for (const s of shares) {
+            const gid = s.expense.groupId;
+            balances[gid] ??= 0;
+
+            // user paid for others
+            if (s.expense.paidBy === userId && s.userId !== userId) {
+                balances[gid] += Number(s.share);
+            }
+
+            // user owes payer
+            if (s.userId === userId && s.expense.paidBy !== userId) {
+                balances[gid] -= Number(s.share);
+            }
+        }
+
+        for (const s of settlements) {
+            balances[s.groupId] ??= 0;
+
+            if (s.paidBy === userId) balances[s.groupId] += Number(s.amount);
+            if (s.paidTo === userId) balances[s.groupId] -= Number(s.amount);
+        }
+
+        // 5. Format preview
+        return memberships.map(m => ({
+            id: m.group.id,
+            name: m.group.name,
+            balance: balances[m.group.id] ?? 0,
+            memberAvatars: m.group.members
+                .slice(0, 4)
+                .map(mem => mem.user.avatar)
+                .filter(Boolean),
+        }));
+    },
 };
