@@ -1,4 +1,5 @@
 import { getMonthRange } from '../../utils/utils';
+import { mapExpenses, mapSettlements, mapTransactions } from './activity.mapper';
 import { dashboardRepository } from './dashboard.repository';
 
 function calculateDebts(userId: number, expenses: any[], settlements: any[]) {
@@ -160,54 +161,22 @@ export const dashboardService = {
             dashboardRepository.getUserSettlements(userId, cursor, limit),
         ]);
 
-        const timeline = [];
+        const feed = [
+            ...mapTransactions(userId, transactions),
+            ...mapExpenses(userId, expenses),
+            ...mapSettlements(userId, settlements),
+        ];
 
-        // transactions
-        for (const t of transactions) {
-            timeline.push({
-                type: 'transaction',
-                title: t.title,
-                amount: Number(t.amount),
-                createdAt: t.createdAt,
-            });
-        }
+        // SORT GLOBAL TIMELINE
+        feed.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-        // expenses
-        for (const e of expenses) {
-            const share = e.participants[0]?.share || 0;
-
-            timeline.push({
-                type: 'expense',
-                title: e.description,
-                amount: Number(share),
-                group: e.group.name,
-                paidByYou: e.payer.id === userId,
-                createdAt: e.createdAt,
-            });
-        }
-
-        // settlements
-        for (const s of settlements) {
-            timeline.push({
-                type: 'settlement',
-                amount: Number(s.amount),
-                direction: s.paidBy === userId ? 'paid' : 'received',
-                user: s.paidBy === userId ? s.receiver.name : s.payer.name,
-                createdAt: s.createdAt,
-            });
-        }
-
-        // sort newest first
-        timeline.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        const sliced = timeline.slice(0, limit);
-
-        const nextCursor = sliced.length === limit ? sliced[sliced.length - 1].createdAt : null;
+        const sliced = feed.slice(0, limit);
+        const last = sliced[sliced.length - 1];
 
         return {
             activity: sliced,
-            nextCursor,
-            hasMore: !!nextCursor,
+            nextCursor: last?.createdAt ?? null,
+            hasMore: feed.length > limit,
         };
     },
 };
