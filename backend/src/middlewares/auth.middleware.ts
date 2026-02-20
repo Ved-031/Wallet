@@ -33,14 +33,8 @@ export const protectRoute = asyncHandler(
         let user = await prisma.user.findUnique({ where: { clerkId } });
 
         if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    clerkId,
-                    email: (payload as any).email,
-                    name: (payload as any).fullName,
-                    avatar: (payload as any).imageUrl ?? null,
-                }
-            })
+            throw new Error('User not found');
+            // return res.status(401).json({ message: 'User not found' });
         }
 
         req.user = {
