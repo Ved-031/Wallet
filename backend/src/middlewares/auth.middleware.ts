@@ -30,10 +30,17 @@ export const protectRoute = asyncHandler(
             return res.status(401).json({ message: 'Invalid token' });
         }
 
-        const user = await prisma.user.findUnique({ where: { clerkId } });
+        let user = await prisma.user.findUnique({ where: { clerkId } });
 
         if (!user) {
-            return res.status(401).json({ message: 'User not synced yet. Please retry.' });
+            user = await prisma.user.create({
+                data: {
+                    clerkId,
+                    email: (payload as any).email,
+                    name: (payload as any).fullName,
+                    avatar: (payload as any).imageUrl ?? null,
+                }
+            })
         }
 
         req.user = {

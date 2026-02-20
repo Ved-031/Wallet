@@ -81,38 +81,38 @@ export const clerkWebhook = asyncHandler(async (req: Request, res: Response) => 
     const evt = await verifyWebhook(req);
     const eventType = evt.type;
 
-    if (eventType === 'user.created' || eventType === 'user.updated') {
-        const user = await prisma.user.findUnique({
-            where: {
+    try {
+        if (eventType === 'user.created' || eventType === 'user.updated') {
+            const userData = {
                 clerkId: evt.data.id,
-            },
-        });
+                name: evt.data.first_name + ' ' + evt.data.last_name,
+                email: evt.data?.email_addresses[0]?.email_address,
+                avatar: evt.data?.image_url,
+            };
 
-        const userData = {
-            clerkId: evt.data.id,
-            name: evt.data.first_name + " " + evt.data.last_name,
-            email: evt.data?.email_addresses[0]?.email_address,
-            avatar: evt.data?.image_url,
-        }
-
-        if (user) {
-            await prisma.user.update({
+            await prisma.user.upsert({
                 where: {
                     clerkId: evt.data.id,
                 },
-                data: userData,
-            });
-        } else {
-            await prisma.user.create({
-                data: {
-                    ...userData
-                }
+                update: userData,
+                create: userData,
             });
         }
 
-        return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-        });
+        if (eventType === 'user.deleted') {
+            await prisma.user
+                .delete({
+                    where: {
+                        clerkId: evt.data.id,
+                    },
+                })
+                .catch(() => null);
+        }
+    } catch (error) {
+        console.error('Webhook error', error);
     }
+
+    return res.status(200).json({
+        success: true,
+    });
 });
