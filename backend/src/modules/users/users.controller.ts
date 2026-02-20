@@ -4,6 +4,7 @@ import { verifyToken } from '@clerk/backend';
 import { AppError } from '../../utils/AppError';
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/AsyncHandler';
+import { verifyWebhook } from '@clerk/express/webhooks';
 
 /**
  * @swagger
@@ -60,4 +61,58 @@ export const authCallback = asyncHandler(async (req: Request, res: Response) => 
         message: 'Authenticated',
         user,
     });
+});
+
+/**
+ * @swagger
+ * /user/clerk:
+ *   post:
+ *     summary: Sync logged-in Clerk user with database
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User synced successfully
+ *       401:
+ *         description: Unauthenticated
+ */
+export const clerkWebhook = asyncHandler(async (req: Request, res: Response) => {
+    const evt = await verifyWebhook(req);
+    const eventType = evt.type;
+
+    if (eventType === 'user.created' || eventType === 'user.updated') {
+        const user = await prisma.user.findUnique({
+            where: {
+                clerkId: evt.data.id,
+            },
+        });
+
+        const userData = {
+            clerkId: evt.data.id,
+            name: evt.data.first_name + " " + evt.data.last_name,
+            email: evt.data?.email_addresses[0]?.email_address,
+            avatar: evt.data?.image_url,
+        }
+
+        if (user) {
+            await prisma.user.update({
+                where: {
+                    clerkId: evt.data.id,
+                },
+                data: userData,
+            });
+        } else {
+            await prisma.user.create({
+                data: {
+                    ...userData
+                }
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+        });
+    }
 });
