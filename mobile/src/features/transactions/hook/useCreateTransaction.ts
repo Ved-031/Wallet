@@ -81,6 +81,8 @@ export const useCreateTransaction = () => {
         },
 
         onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['monthly-spending'] });
+            queryClient.invalidateQueries({ queryKey: ['category-breakdown'] });
             queryClient.invalidateQueries({ queryKey: ['activity-preview'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard-activity'] });
