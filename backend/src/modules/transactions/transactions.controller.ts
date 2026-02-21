@@ -87,6 +87,38 @@ export const getTransactions = asyncHandler(async (req: AuthenticatedRequest, re
 
 /**
  * @swagger
+ * /transactions/${id}:
+ *   get:
+ *     summary: Get particular transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Transaction
+ */
+export const getTransaction = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.id;
+    const id = Number(req.params.id);
+
+    const transaction = await transactionService.getById(userId, id);
+
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: transaction,
+        }),
+    );
+});
+
+/**
+ * @swagger
  * /transactions/{id}:
  *   patch:
  *     summary: Update a transaction
@@ -139,7 +171,7 @@ export const deleteTransaction = asyncHandler(async (req: AuthenticatedRequest, 
     const userId = req.user!.id;
     const id = Number(req.params.id);
 
-    await transactionService.delete(userId, id);
+    await transactionService.delete(userId, Number(id));
 
     res.status(200).json(
         new ApiResponse({

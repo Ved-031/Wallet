@@ -33,6 +33,20 @@ export const transactionService = {
         };
     },
 
+    async getById(userId: number, id: number) {
+        const transaction = await transactionRepository.findById(id);
+
+        if (!transaction) {
+            throw new AppError('Transaction not found', 404);
+        }
+
+        if (transaction.userId !== userId) {
+            throw new AppError('Not authorized to access this transaction', 403);
+        }
+
+        return transaction;
+    },
+
     async update(userId: number, id: number, data: Partial<CreateTransactionDto>) {
         const existing = await transactionRepository.findById(id);
 
