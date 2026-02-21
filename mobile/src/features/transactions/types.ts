@@ -17,3 +17,5 @@ export type CreateTransactionDto = {
     type: TransactionType;
     category?: string;
 };
+
+export type UpdateTransactionDto = Partial<CreateTransactionDto>;

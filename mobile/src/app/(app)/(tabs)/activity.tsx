@@ -1,18 +1,21 @@
+import { router } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import EmptyState from '@/shared/components/EmptyState';
-import { ActivityFilter } from '@/features/activity/types';
 import { useActivity } from '@/features/activity/hooks/useActivity';
-import { View, Text, SectionList, ActivityIndicator } from 'react-native';
+import { ActivityFilter, ActivityUI } from '@/features/activity/types';
 import { mapActivityToUI } from '@/features/activity/utils/mapActivityToUI';
 import { ActivityItem } from '@/features/dashboard/components/ActivityItem';
+import { View, Text, SectionList, ActivityIndicator, Alert } from 'react-native';
 import { groupActivitiesByMonth } from '@/features/activity/utils/groupActivites';
 import { ActivityFilterTabs } from '@/features/activity/components/ActivityFilter';
+import { useDeleteTransaction } from '@/features/transactions/hook/useDeleteTransaction';
 
 export default function ActivityScreen() {
     const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
         useActivity();
+    const { mutateAsync } = useDeleteTransaction();
 
     const [filter, setFilter] = React.useState<ActivityFilter>('ALL');
 
@@ -30,6 +33,31 @@ export default function ActivityScreen() {
         () => groupActivitiesByMonth(activities),
         [activities]
     );
+
+    const handleDelete = (item: ActivityUI) => {
+        Alert.alert(
+            "Delete Transaction",
+            "Are you sure you want to delete this transaction?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const numericId = Number(item.id.replace('txn_', ''));
+                            await mutateAsync(numericId);
+                        } catch (e) {
+                            Alert.alert('Error', 'Failed to delete transaction. Please try again.');
+                        }
+                    },
+                },
+            ]
+        )
+    }
 
     if (isLoading) {
         return (
@@ -73,7 +101,16 @@ export default function ActivityScreen() {
                 stickySectionHeadersEnabled
                 contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
 
-                renderItem={({ item }) => <ActivityItem item={item} />}
+                renderItem={({ item }) => (
+                    <ActivityItem
+                        item={item}
+                        onEdit={(item) => router.push({
+                            pathname: '/(app)/transactions/edit/[id]',
+                            params: { id: item.id },
+                        })}
+                        onDelete={(item) => handleDelete(item)}
+                    />
+                )}
 
                 renderSectionHeader={({ section: { title } }) => (
                     <View className="bg-background pt-6 pb-2">

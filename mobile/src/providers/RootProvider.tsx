@@ -18,6 +18,7 @@ import SafeScreen from '@/shared/components/SafeScreen';
 import { QueryProvider } from '@/core/query/QueryProvider';
 // import AuthSync from '@/features/auth/components/AuthSync';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ActivitySheetProvider } from '@/features/activity/context/ActivitySheetContext';
 
 type Props = PropsWithChildren;
 
@@ -58,8 +59,10 @@ export default function RootProviders({ children }: Props) {
                 <QueryProvider>
                     <AuthBridge>
                         <SafeScreen>
-                            {/* <AuthSync /> */}
-                            {children}
+                            <ActivitySheetProvider>
+                                {/* <AuthSync /> */}
+                                {children}
+                            </ActivitySheetProvider>
                         </SafeScreen>
                     </AuthBridge>
                 </QueryProvider>
