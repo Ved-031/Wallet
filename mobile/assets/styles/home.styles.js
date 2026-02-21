@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import { COLORS } from '@/shared/constants/colors';
 
 export const styles = StyleSheet.create({
     container: {
@@ -142,8 +142,8 @@ export const styles = StyleSheet.create({
             height: 1,
         },
         shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        shadowRadius: 10,
+        elevation: 1,
     },
     transactionContent: {
         flex: 1,

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import { COLORS } from '@/shared/constants/colors';
 
 export const styles = StyleSheet.create({
     container: {
@@ -25,6 +25,7 @@ export const styles = StyleSheet.create({
     saveButtonContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 4,
     },
     saveButtonDisabled: {
@@ -107,13 +108,20 @@ export const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
     },
     inputIcon: {
-        marginHorizontal: 12,
+        marginLeft: 12,
+        marginRight: 8,
     },
     input: {
         flex: 1,
         padding: 12,
         fontSize: 16,
         color: COLORS.text,
+    },
+    sectionContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 2,
+        alignItems: 'center',
     },
     sectionTitle: {
         fontSize: 18,
