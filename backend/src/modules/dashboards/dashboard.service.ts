@@ -181,6 +181,16 @@ export const dashboardService = {
     },
 
     async getGroupsPreview(userId: number) {
-        return dashboardRepository.getGroupsPreview(userId);
+        const groups = await dashboardRepository.getGroupsPreview(userId);
+
+        return groups.map(g => ({
+            id: g.id,
+            name: g.name,
+            memberAvatars: g.memberAvatars,
+            balance: g.balance,
+            youOwe: Math.max(0, -g.balance),
+            youAreOwed: Math.max(0, g.balance),
+            isSettled: g.balance === 0,
+        }));
     },
 };
