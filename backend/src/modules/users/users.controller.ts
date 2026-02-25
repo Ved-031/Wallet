@@ -5,6 +5,7 @@ import { AppError } from '../../utils/AppError';
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/AsyncHandler';
 import { verifyWebhook } from '@clerk/express/webhooks';
+import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
 /**
  * @swagger
@@ -115,4 +116,32 @@ export const clerkWebhook = asyncHandler(async (req: Request, res: Response) => 
     return res.status(200).json({
         success: true,
     });
+});
+
+/**
+ * @swagger
+ * /user/me:
+ *   get:
+ *     summary: Getlogged-in user data
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User synced successfully
+ *       401:
+ *         description: Unauthenticated
+ */
+export const getDbUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const clerkId = req.user?.clerkId;
+
+    if (!clerkId) {
+        throw new AppError('User not found', 404);
+    }
+
+    const user = await prisma.user.findUnique({ where: { clerkId } });
+
+    return res.status(200).json({
+        data: user,
+     });
 });
