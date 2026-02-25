@@ -1,4 +1,3 @@
-import dayjs from '@/shared/utils/dayjs';
 import { ActivityItem, ActivityUI } from '../types';
 
 export const mapActivityToUI = (item: ActivityItem): ActivityUI => {
