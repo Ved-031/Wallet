@@ -22,7 +22,15 @@ export const balanceService = {
             const paid = Number(p.paidShare);
             const owed = Number(p.share);
 
-            balances[p.userId] += paid - owed;
+            // user paid extra -> others owe him
+            if (paid > owed) {
+                balances[p.userId] += paid - owed;
+            }
+
+            // user underpaid -> he owes others
+            if (owed > paid) {
+                balances[p.userId] -= owed - paid;
+            }
         }
 
         // 3️⃣ apply settlements
