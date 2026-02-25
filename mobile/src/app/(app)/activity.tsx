@@ -7,10 +7,10 @@ import { useActivity } from '@/features/activity/hooks/useActivity';
 import { ActivityFilter, ActivityUI } from '@/features/activity/types';
 import { mapActivityToUI } from '@/features/activity/utils/mapActivityToUI';
 import { ActivityItem } from '@/features/dashboard/components/ActivityItem';
-import { View, Text, SectionList, ActivityIndicator, Alert } from 'react-native';
 import { groupActivitiesByMonth } from '@/features/activity/utils/groupActivites';
 import { ActivityFilterTabs } from '@/features/activity/components/ActivityFilter';
 import { useDeleteTransaction } from '@/features/transactions/hook/useDeleteTransaction';
+import { View, Text, SectionList, ActivityIndicator, Alert, Pressable } from 'react-native';
 
 export default function ActivityScreen() {
     const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -61,7 +61,7 @@ export default function ActivityScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center">
+            <View className="flex-1 bg-background items-center justify-center">
                 <ActivityIndicator />
             </View>
         );
@@ -69,19 +69,18 @@ export default function ActivityScreen() {
 
     return (
         <View className='flex-1 bg-background'>
-            <View className='flex-row items-center justify-center gap-2 mt-10'>
-                <Ionicons
-                    name='stopwatch-outline'
-                    size={24}
-                    color={COLORS.text}
-                />
-                <Text className="text-text font-semibold text-3xl">All Activities {' '}</Text>
-                <Text className="text-textLight text-2xl">({activities.length})</Text>
+            <View className='flex-row items-center px-5 mt-10 mb-5 w-full'>
+                <Pressable onPress={() => router.back()}>
+                    <Ionicons
+                        name='chevron-back-outline'
+                        size={24}
+                        color={COLORS.text}
+                    />
+                </Pressable>
+                <Text className="text-text font-semibold text-3xl ml-5">All Activities</Text>
             </View>
 
-            <View className='h-[1px] my-5 bg-border' />
-
-            <View className="px-4 pt-2">
+            <View className="px-5 pt-2">
                 <ActivityFilterTabs value={filter} onChange={setFilter} />
             </View>
 
@@ -100,7 +99,6 @@ export default function ActivityScreen() {
                 keyExtractor={item => item.id}
                 stickySectionHeadersEnabled
                 contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-
                 renderItem={({ item }) => (
                     <ActivityItem
                         item={item}
@@ -111,7 +109,6 @@ export default function ActivityScreen() {
                         onDelete={(item) => handleDelete(item)}
                     />
                 )}
-
                 renderSectionHeader={({ section: { title } }) => (
                     <View className="bg-background pt-6 pb-2">
                         <Text className="text-textLight text-sm font-semibold">
@@ -119,16 +116,13 @@ export default function ActivityScreen() {
                         </Text>
                     </View>
                 )}
-
                 ItemSeparatorComponent={() => (
                     <View className="h-[0.5px] bg-border ml-14" />
                 )}
-
                 onEndReachedThreshold={0.4}
                 onEndReached={() => {
                     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
                 }}
-
                 ListFooterComponent={
                     isFetchingNextPage ? (
                         <View className="py-6">

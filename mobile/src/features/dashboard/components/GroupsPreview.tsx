@@ -30,15 +30,16 @@ export const GroupsPreview = () => {
             <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={data}
-                keyExtractor={(item) => item.id.toString()}
+                data={data.slice(0, 3).reverse()}
+                keyExtractor={(item, index) => item.id ? String(item.id) : `group-${index}`}
                 contentContainerStyle={{ paddingRight: 16 }}
                 renderItem={({ item }) => (
                     <GroupPreviewCard
-                        name={item.name}
-                        balance={item.balance}
-                        avatars={item.memberAvatars}
-                        onPress={() => router.push(`/groups/${item.id}`)}
+                        group={item}
+                        onPress={() => router.push({
+                            pathname: '/groups/[id]',
+                            params: { id: item.id },
+                        })}
                     />
                 )}
             />

@@ -66,17 +66,17 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
-                    name="insights"
+                    name="groups"
                     options={{
-                        title: 'Insights',
+                        title: 'Groups',
                         tabBarIcon: ({ color, size, focused }) => (
                             <Ionicons
-                                name={focused ? 'stats-chart' : 'stats-chart-outline'}
+                                name={focused ? 'people' : 'people-outline'}
                                 color={focused ? COLORS.text : color}
                                 size={size}
                             />
                         ),
-                        tabBarLabel: ({ focused }) => <TabItemLabel label="Insights" focused={focused} />,
+                        tabBarLabel: ({ focused }) => <TabItemLabel label="Groups" focused={focused} />,
                     }}
                 />
 
@@ -112,17 +112,17 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
-                    name="activity"
+                    name="insights"
                     options={{
-                        title: 'Activity',
+                        title: 'Insights',
                         tabBarIcon: ({ color, size, focused }) => (
                             <Ionicons
-                                name={focused ? 'time' : 'time-outline'}
+                                name={focused ? 'stats-chart' : 'stats-chart-outline'}
                                 color={focused ? COLORS.text : color}
                                 size={size}
                             />
                         ),
-                        tabBarLabel: ({ focused }) => <TabItemLabel label="Activity" focused={focused} />,
+                        tabBarLabel: ({ focused }) => <TabItemLabel label="Insights" focused={focused} />,
                     }}
                 />
 

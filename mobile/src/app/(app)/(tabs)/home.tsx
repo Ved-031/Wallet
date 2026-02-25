@@ -20,6 +20,7 @@ const HomeScreen = () => {
         await Promise.all([
             queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] }),
             queryClient.invalidateQueries({ queryKey: ['dashboard-activity'] }),
+            queryClient.invalidateQueries({ queryKey: ['dashboard-groups'] }),
         ]);
         setRefreshing(false);
     }
@@ -65,7 +66,7 @@ const HomeScreen = () => {
             showsVerticalScrollIndicator={false}
             refreshControl={<RefreshControl refreshing={refreshing || isFetching} onRefresh={onRefresh} />}
         >
-            <View className='p-5 pb-0'>
+            <View className='p-5 pb-10'>
                 <DashboardHeader />
                 {isLoading ? (
                     <BalanceCardSkeleton />

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getGroupsPreview } from '../api/getGroupsPreview';
+import { getGroupsPreview } from '../../groups/api/getGroupsPreview';
 
 export const useDashboardGroups = () => {
     return useQuery({

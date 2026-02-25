@@ -21,7 +21,7 @@ const NoTransactionFound = () => {
             </Text>
             <TouchableOpacity
                 style={styles.emptyStateButton}
-                // onPress={() => router.push('/create')}
+                onPress={() => router.push('/(app)/transactions/create')}
             >
                 <Ionicons name="add-circle" size={18} color={COLORS.white} />
                 <Text style={styles.emptyStateButtonText}>Add Transaction</Text>

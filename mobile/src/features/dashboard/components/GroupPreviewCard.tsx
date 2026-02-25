@@ -1,24 +1,24 @@
+import { GroupPreview } from '../types';
 import { formatCurrency } from '@/shared/utils/currency';
 import { Text, Pressable, View, Image } from 'react-native';
 
 type Props = {
-    name: string;
-    balance: number;
-    avatars: string[];
+    group: GroupPreview;
     onPress: () => void;
 };
 
-export const GroupPreviewCard = ({ name, balance, avatars, onPress }: Props) => {
+export const GroupPreviewCard = ({ group, onPress }: Props) => {
+    const { name, balance, memberAvatars } = group;
     const positive = balance >= 0;
 
     return (
         <Pressable
             onPress={onPress}
-            className="bg-card rounded-2xl p-4 mr-3 w-[160px] shadow-sm"
+            className="bg-card rounded-2xl p-4 mr-3 w-[160px] shadow-sm border border-border"
         >
             {/* Avatar stack */}
             <View className="flex-row mb-3">
-                {avatars.slice(0, 3).map((a, i) => (
+                {(memberAvatars ?? []).slice(0, 3).map((a, i) => (
                     <Image
                         key={i}
                         source={{ uri: a }}
