@@ -195,10 +195,7 @@ export default function AddTransactionScreen() {
                                         selected && 'bg-primary border-primary'
                                     )}
                                 >
-                                    <Text
-                                        className={`text-[14px] ${selected ? "text-white" : "text-text"
-                                            }`}
-                                    >
+                                    <Text className={`text-[14px] ${selected ? "text-white" : "text-text"}`}>
                                         {item}
                                     </Text>
                                 </Pressable>

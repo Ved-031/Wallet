@@ -1,6 +1,5 @@
 import { api } from '@/core/api/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { invalidateDashboard } from '@/shared/utils/queryInvalidation';
 
 type CreateExpenseInput = {
     groupId: number;
