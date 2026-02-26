@@ -51,4 +51,43 @@ export const groupRepository = {
             },
         });
     },
+
+    async getGroupActivity(groupId: number, userId: number, cursor?: Date, limit = 20) {
+        const [expenses, settlements] = await Promise.all([
+            // ALL EXPENSES
+            prisma.expense.findMany({
+                where: {
+                    groupId,
+                    ...(cursor && { createdAt: { lt: cursor } }),
+                },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                include: {
+                    payer: { select: { id: true, name: true, avatar: true } },
+                    participants: {
+                        include: {
+                            user: { select: { id: true, name: true, avatar: true } },
+                        },
+                    },
+                },
+            }),
+
+            // ONLY MY SETTLEMENTS
+            prisma.settlement.findMany({
+                where: {
+                    groupId,
+                    OR: [{ paidBy: userId }, { paidTo: userId }],
+                    ...(cursor && { createdAt: { lt: cursor } }),
+                },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                include: {
+                    payer: { select: { id: true, name: true, avatar: true } },
+                    receiver: { select: { id: true, name: true, avatar: true } },
+                },
+            }),
+        ]);
+
+        return { expenses, settlements };
+    },
 };

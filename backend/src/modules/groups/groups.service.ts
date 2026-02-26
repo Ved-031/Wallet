@@ -73,4 +73,42 @@ export const groupService = {
 
         return { message: 'Member removed successfully' };
     },
+
+    async getGroupActivity(userId: number, groupId: number, query: any) {
+        const cursor = query.cursor ? new Date(query.cursor) : undefined;
+        const limit = Math.min(Number(query.limit) || 20, 50);
+
+        const { expenses, settlements } = await groupRepository.getGroupActivity(
+            groupId,
+            userId,
+            cursor,
+            limit,
+        );
+
+        const mappedExpenses = expenses.map(e => ({
+            id: `exp_${e.id}`,
+            type: 'EXPENSE',
+            createdAt: e.createdAt,
+            data: e,
+        }));
+
+        const mappedSettlements = settlements.map(s => ({
+            id: `set_${s.id}`,
+            type: 'SETTLEMENT',
+            createdAt: s.createdAt,
+            data: s,
+        }));
+
+        const feed = [...mappedExpenses, ...mappedSettlements]
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .slice(0, limit);
+
+        const last = feed[feed.length - 1];
+
+        return {
+            activity: feed,
+            nextCursor: last?.createdAt ?? null,
+            hasMore: feed.length === limit,
+        };
+    },
 };

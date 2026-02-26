@@ -158,3 +158,21 @@ export const removeMember = asyncHandler(async (req: AuthenticatedRequest, res: 
         }),
     );
 });
+
+export const getGroupActivity = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.id;
+    const groupId = Number(req.params.groupId);
+
+    const result = await groupService.getGroupActivity(userId, groupId, req.query);
+
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: result.activity,
+            meta: {
+                nextCursor: result.nextCursor,
+                hasMore: result.hasMore,
+            },
+        }),
+    );
+});

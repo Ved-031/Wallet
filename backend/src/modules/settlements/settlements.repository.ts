@@ -26,10 +26,14 @@ export const settlementsRepository = {
         });
     },
 
-    async getGroupSettlements(groupId: number, cursor?: Date, limit = 20) {
+    async getGroupSettlements(groupId: number, currentUserId: number, cursor?: Date, limit = 20) {
         return prisma.settlement.findMany({
             where: {
                 groupId,
+                OR: [
+                    { paidBy: currentUserId },
+                    { paidTo: currentUserId },
+                ],
                 ...(cursor && {
                     createdAt: {
                         lt: cursor,

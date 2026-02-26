@@ -43,7 +43,7 @@ export const settlementsService = {
         const limit = Math.min(Number(query.limit) || 20, 50);
         const cursor = query.cursor ? new Date(query.cursor) : undefined;
 
-        const settlements = await settlementsRepository.getGroupSettlements(groupId, cursor, limit);
+        const settlements = await settlementsRepository.getGroupSettlements(groupId, currentUserId, cursor, limit);
 
         const nextCursor =
             settlements.length === limit ? settlements[settlements.length - 1].createdAt : null;
