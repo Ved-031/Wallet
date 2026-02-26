@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import { useClerk, useUser } from '@clerk/clerk-expo';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { View, Text, Image, Switch, Alert, Pressable } from 'react-native';
 
@@ -9,6 +10,7 @@ const ProfileScreen = () => {
     const router = useRouter();
     const { user } = useUser();
     const { signOut } = useClerk();
+    const queryClient = useQueryClient();
 
     const displayName = user?.fullName ?? user?.emailAddresses[0].emailAddress?.split('@')[0] ?? 'User';
     const image = user?.imageUrl ?? null;
@@ -24,6 +26,7 @@ const ProfileScreen = () => {
             { text: 'Cancel', style: 'cancel' },
             { text: 'Logout', style: 'destructive', onPress: () => signOut() },
         ]);
+        queryClient.clear();
     };
 
     return (

@@ -7,7 +7,9 @@ import { mapGroupExpenseToUI } from '@/features/groups/mapGroupExpense';
 import { useGetGroupDetails } from '@/features/groups/hooks/useGetGroupDetails';
 import { GroupExpenseItem } from '@/features/groups/components/GroupExpenseItem';
 import { useGetGroupExpenses } from '@/features/groups/hooks/useGetGroupExpenses';
+import { GroupBalancesSection } from '@/features/groups/components/GroupBalancesSection';
 import { ActivityIndicator, View, Text, Pressable, Image, ScrollView } from 'react-native';
+import { SettlementSuggestionsSection } from '@/features/groups/components/SettlementSuggestionsSection';
 
 export default function GroupDetailsScreen() {
     const { id } = useLocalSearchParams();
@@ -48,22 +50,19 @@ export default function GroupDetailsScreen() {
 
             <View className='border-b-[0.5px] border-border mb-6' />
 
-            <ScrollView contentContainerStyle={{ padding: 20 }}>
-                {/* SUMMARY CARD */}
-                <View className="bg-card rounded-3xl p-6 mb-6 border border-border">
-                    <Text className="text-textLight text-sm mb-2">
-                        Group Summary
-                    </Text>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30, gap: 16 }}>
+                {/* SETTLEMENT SUGGESTIONS */}
+                <SettlementSuggestionsSection groupId={groupId} />
 
-                    <Text className="text-text text-2xl font-bold">
-                        All settled
-                    </Text>
+                <View className='border-b-[0.5px] border-border' />
 
-                    {/* Later we will calculate actual balance */}
-                </View>
+                {/* BALANCES */}
+                <GroupBalancesSection groupId={groupId} />
+
+                <View className='border-b-[0.5px] border-border' />
 
                 {/* MEMBERS */}
-                <View className="mb-6">
+                <View>
                     <Text className="text-text text-lg font-semibold mb-4">
                         Members
                     </Text>
@@ -100,8 +99,10 @@ export default function GroupDetailsScreen() {
                     ))}
                 </View>
 
+                <View className='border-b-[0.5px] border-border' />
+
                 {/* EXPENSES */}
-                <View className="mt-4">
+                <View>
                     <Text className="text-text text-lg font-semibold mb-5">
                         Expenses
                     </Text>

@@ -66,3 +66,25 @@ export type GroupExpenseApiRes = {
     };
     success: boolean;
 }
+
+export type GroupBalance = {
+    userId: number;
+    name: string;
+    email: string;
+    avatar: string | null;
+    balance: number;
+};
+
+export type SettlementSuggestion = {
+    from: {
+        userId: number;
+        name: string;
+        avatar?: string | null;
+    };
+    to: {
+        userId: number;
+        name: string;
+        avatar?: string | null;
+    };
+    amount: number;
+}

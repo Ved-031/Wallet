@@ -18,7 +18,7 @@ export const GroupExpenseItem = ({ item }: { item: GroupExpenseUI }) => {
                 : '';
 
     return (
-        <View className="flex-row items-center border-b-[0.5px] border-border pb-4">
+        <View className="flex-row items-center border-b-[0.5px] border-border py-2">
             <Image
                 source={{ uri: item.avatar }}
                 className="w-11 h-11 rounded-full"
