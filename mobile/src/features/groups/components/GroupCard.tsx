@@ -1,10 +1,10 @@
+import { router } from "expo-router";
 import { cn } from "@/shared/utils/cn";
 import { GroupPreview } from "../types";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/shared/constants/colors";
 import { formatCurrency } from "@/shared/utils/currency";
 import { Image, Pressable, Text, View } from "react-native";
-import { router } from "expo-router";
 
 type Props = {
     group: GroupPreview;
@@ -14,8 +14,8 @@ export const GroupCard = ({ group }: Props) => {
     const statusText = group.balance === 0
         ? 'All settled'
         : group.balance > 0
-            ? 'You are owed'
-            : 'You owe';
+            ? 'You owe total of'
+            : 'You are owed total of';
 
     const netAmount = Math.abs(group.balance);
 
@@ -24,8 +24,8 @@ export const GroupCard = ({ group }: Props) => {
     const color = group.isSettled
         ? 'text-textLight'
         : (group.youOwe ?? 0) > 0
-            ? 'text-red-500'
-            : 'text-green-600';
+            ? 'text-green-600'
+            : 'text-red-500';
 
     return (
         <Pressable
@@ -60,14 +60,14 @@ export const GroupCard = ({ group }: Props) => {
                         ? null
                         : group.balance > 0
                             ? <Ionicons
-                                name="arrow-up-outline"
-                                size={14}
-                                color={COLORS.income}
-                            />
-                            : <Ionicons
                                 name="arrow-down-outline"
                                 size={14}
                                 color={COLORS.expense}
+                            />
+                            : <Ionicons
+                                name="arrow-up-outline"
+                                size={14}
+                                color={COLORS.income}
                             />
                     }
                     <Text className="text-textLight text-sm">

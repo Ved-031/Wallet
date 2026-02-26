@@ -10,7 +10,7 @@ type Props = {
 
 export const GroupPreviewCard = ({ group, onPress }: Props) => {
     const { name, balance, memberAvatars } = group;
-    const positive = balance >= 0;
+    const positive = balance > 0;
 
     return (
         <Pressable
@@ -36,7 +36,7 @@ export const GroupPreviewCard = ({ group, onPress }: Props) => {
 
             {/* Balance */}
             <Text className="text-textLight text-sm mt-1">
-                {positive ? 'You owe' : 'You get'}
+                {balance === 0 ? 'All settled' : positive ? 'You owe' : 'You get'}
             </Text>
 
             <Text className={cn('font-bold text-lg mt-0.5', positive ? 'text-red-600' : 'text-green-600')}>

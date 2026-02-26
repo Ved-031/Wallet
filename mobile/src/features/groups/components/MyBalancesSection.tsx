@@ -1,11 +1,20 @@
-import { View, Text } from 'react-native';
 import { BalanceRow } from './BalanceRow';
+import { COLORS } from '@/shared/constants/colors';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { useGroupBalances } from '../hooks/useGroupBalances';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
 export const MyBalancesSection = ({ groupId }: { groupId: number }) => {
-    const { data } = useGroupBalances(groupId);
+    const { data, isLoading } = useGroupBalances(groupId);
     const { data: me } = useCurrentUser();
+
+    if (isLoading) {
+        return (
+            <View className='flex items-center justify-center'>
+                <ActivityIndicator size={'small'} color={COLORS.primary} />
+            </View>
+        )
+    }
 
     if (!data || !me) return null;
 

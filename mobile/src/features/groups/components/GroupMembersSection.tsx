@@ -31,7 +31,7 @@ const GroupMemberItem = ({ member, isAdmin }: { member: Group['members'][0], isA
                 </View>
             </View>
 
-            {isAdmin && (
+            {isAdmin && member.role !== 'ADMIN' && (
                 <Ionicons
                     name="person-remove-outline"
                     size={18}
