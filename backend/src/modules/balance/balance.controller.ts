@@ -32,6 +32,22 @@ export const getGroupBalances = asyncHandler(async (req: AuthenticatedRequest, r
         new ApiResponse({
             success: true,
             data: balances,
-        })
+        }),
     );
 });
+
+export const getSimplifiedSettlements = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+        const currentUserId = req.user!.id;
+        const groupId = Number(req.params.groupId);
+
+        const settlements = await balanceService.getSimplifiedSettlements(currentUserId, groupId);
+
+        res.status(200).json(
+            new ApiResponse({
+                success: true,
+                data: settlements,
+            }),
+        );
+    },
+);
