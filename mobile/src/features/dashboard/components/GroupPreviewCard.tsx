@@ -1,3 +1,4 @@
+import { cn } from '@/shared/utils/cn';
 import { GroupPreview } from '../types';
 import { formatCurrency } from '@/shared/utils/currency';
 import { Text, Pressable, View, Image } from 'react-native';
@@ -35,10 +36,10 @@ export const GroupPreviewCard = ({ group, onPress }: Props) => {
 
             {/* Balance */}
             <Text className="text-textLight text-sm mt-1">
-                {positive ? 'You get' : 'You owe'}
+                {positive ? 'You owe' : 'You get'}
             </Text>
 
-            <Text className="text-text font-bold text-lg mt-0.5">
+            <Text className={cn('font-bold text-lg mt-0.5', positive ? 'text-red-600' : 'text-green-600')}>
                 {formatCurrency(Math.abs(balance))}
             </Text>
         </Pressable>

@@ -1,15 +1,15 @@
-import { useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { mapGroupExpenseToUI } from '@/features/groups/mapGroupExpense';
+import { GroupHeader } from '@/features/groups/components/GroupHeader';
 import { useGetGroupDetails } from '@/features/groups/hooks/useGetGroupDetails';
 import { GroupExpenseItem } from '@/features/groups/components/GroupExpenseItem';
 import { useGetGroupExpenses } from '@/features/groups/hooks/useGetGroupExpenses';
-import { GroupBalancesSection } from '@/features/groups/components/GroupBalancesSection';
+import { MyBalancesSection } from '@/features/groups/components/MyBalancesSection';
+import GroupMembersSection from '@/features/groups/components/GroupMembersSection';
 import { ActivityIndicator, View, Text, Pressable, Image, ScrollView } from 'react-native';
-import { SettlementSuggestionsSection } from '@/features/groups/components/SettlementSuggestionsSection';
 
 export default function GroupDetailsScreen() {
     const { id } = useLocalSearchParams();
@@ -35,73 +35,27 @@ export default function GroupDetailsScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            {/* HEADER */}
-            <View className="flex-row items-center justify-between px-5 pt-8 pb-6">
-                <Pressable onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                </Pressable>
-
-                <Text className="text-text text-2xl font-semibold">
-                    {group.name}
-                </Text>
-
-                <Ionicons name="ellipsis-vertical" size={22} color={COLORS.text} />
-            </View>
+            <GroupHeader
+                name={group.name}
+                isAdmin={isAdmin}
+                onLeave={() => {}}
+                onDelete={() => {}}
+            />
 
             <View className='border-b-[0.5px] border-border mb-6' />
 
             <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30, gap: 16 }}>
-                {/* SETTLEMENT SUGGESTIONS */}
-                <SettlementSuggestionsSection groupId={groupId} />
+                <MyBalancesSection groupId={groupId} />
 
                 <View className='border-b-[0.5px] border-border' />
 
-                {/* BALANCES */}
-                <GroupBalancesSection groupId={groupId} />
+                <GroupMembersSection
+                    group={group}
+                    isAdmin={isAdmin}
+                />
 
                 <View className='border-b-[0.5px] border-border' />
 
-                {/* MEMBERS */}
-                <View>
-                    <Text className="text-text text-lg font-semibold mb-4">
-                        Members
-                    </Text>
-
-                    {group.members.map(member => (
-                        <View
-                            key={member.userId}
-                            className="flex-row items-center justify-between mb-4"
-                        >
-                            <View className="flex-row items-center gap-3">
-                                <Image
-                                    source={{ uri: member.user.avatar }}
-                                    className="w-10 h-10 rounded-full"
-                                />
-
-                                <View>
-                                    <Text className="text-text font-medium">
-                                        {member.user.name}
-                                    </Text>
-                                    <Text className="text-textLight text-sm">
-                                        {member.role}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            {isAdmin && member.role !== 'ADMIN' && (
-                                <Ionicons
-                                    name="trash-outline"
-                                    size={18}
-                                    color={COLORS.expense}
-                                />
-                            )}
-                        </View>
-                    ))}
-                </View>
-
-                <View className='border-b-[0.5px] border-border' />
-
-                {/* EXPENSES */}
                 <View>
                     <Text className="text-text text-lg font-semibold mb-5">
                         Expenses
@@ -123,9 +77,9 @@ export default function GroupDetailsScreen() {
 
             {/* FAB */}
             <Pressable
-                className="absolute bottom-8 right-6 bg-primary w-14 h-14 rounded-full items-center justify-center shadow-lg"
+                className="absolute bottom-12 right-8 bg-primary w-20 h-20 rounded-full items-center justify-center shadow-lg"
             >
-                <Ionicons name="add" size={28} color="white" />
+                <Ionicons name="add" size={32} color="white" />
             </Pressable>
         </View>
     );
