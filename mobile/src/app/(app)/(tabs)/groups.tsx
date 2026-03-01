@@ -3,15 +3,22 @@ import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import React, { useCallback, useRef } from 'react';
 import { COLORS } from '@/shared/constants/colors';
+import { InviteRaw } from '@/features/invites/types';
 import NoGroupFound from '@/features/groups/components/NoGroup';
+import { mapInviteToUI } from '@/features/invites/mapInviteToUi';
+import { useInvites } from '@/features/invites/hooks/useInvites';
 import { GroupCard } from '@/features/groups/components/GroupCard';
+import { InviteCard } from '@/features/invites/components/InviteCard';
 import { CreateGroupSheet } from '@/features/groups/components/CreateGroupSheet';
 import { useGetGroupsPreview } from '@/features/groups/hooks/useGetGroupsPreview';
 import { View, FlatList, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 
 const GroupsScreen = () => {
     const bottomSheetRef = useRef<BottomSheet>(null);
+    const { data: rawInvites } = useInvites();
     const { data, isLoading } = useGetGroupsPreview();
+
+    const invites = rawInvites?.map((inv: InviteRaw) => mapInviteToUI(inv));
 
     const openBottomSheet = useCallback(() => {
         bottomSheetRef.current?.snapToIndex(0);
@@ -69,8 +76,23 @@ const GroupsScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* GROUP LIST */}
+                {/* GROUP INVITES */}
                 <FlatList
+                    ListHeaderComponent={
+                        <>
+                            {invites?.length > 0 && (
+                                <View className="mb-6">
+                                    <Text className="text-text text-lg font-semibold mb-3">
+                                        Pending Invites
+                                    </Text>
+
+                                    {invites.map((invite: any) => (
+                                        <InviteCard key={invite.id} invite={invite} />
+                                    ))}
+                                </View>
+                            )}
+                        </>
+                    }
                     data={data}
                     keyExtractor={(item) => String(item.id)}
                     renderItem={({ item }) => <GroupCard group={item} />}
