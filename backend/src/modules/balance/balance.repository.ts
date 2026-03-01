@@ -17,6 +17,11 @@ export const balanceRepository = {
             where: {
                 expense: { groupId },
             },
+            include: {
+                expense: {
+                    select: { id: true, paidBy: true },
+                },
+            },
         });
     },
 
