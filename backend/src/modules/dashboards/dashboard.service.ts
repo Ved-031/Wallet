@@ -1,6 +1,6 @@
 import { getMonthRange } from '../../utils/utils';
-import { mapExpenses, mapSettlements, mapTransactions } from './activity.mapper';
 import { dashboardRepository } from './dashboard.repository';
+import { mapExpenses, mapSettlements, mapTransactions } from './activity.mapper';
 
 function calculateDebts(userId: number, expenses: any[], settlements: any[]) {
     const balances: Record<number, number> = {};
@@ -115,22 +115,33 @@ export const dashboardService = {
     async getSummary(userId: number) {
         const { start, end } = getMonthRange();
 
-        const [personalBalance, activeGroups, personalMonth, groupMonth, expenses, settlements] =
+        const [personalBalance, activeGroups, personalMonth, groupMonth, settlements] =
             await Promise.all([
                 dashboardRepository.getPersonalBalance(userId),
                 dashboardRepository.getActiveGroupsCount(userId),
                 dashboardRepository.getPersonalMonthlyExpense(userId, start, end),
                 dashboardRepository.getGroupMonthlyExpense(userId, start, end),
-                dashboardRepository.getAllGroupExpenses(userId),
                 dashboardRepository.getAllSettlements(userId),
             ]);
 
-        // debt math
-        const { youOwe, youAreOwed } = calculateDebts(userId, expenses, settlements);
+        let youOwe = 0;
+        let youAreOwed = 0;
 
-        const totalExpensesThisMonth = personalMonth + groupMonth;
+        for (const s of settlements) {
+            const amount = Number(s.amount);
+
+            if (s.paidBy === userId) {
+                youOwe += amount;
+            }
+
+            if (s.paidTo === userId) {
+                youAreOwed += amount;
+            }
+        }
 
         const netBalance = personalBalance + youAreOwed - youOwe;
+
+        const totalExpensesThisMonth = personalMonth + groupMonth;
 
         return {
             netBalance,
@@ -155,15 +166,13 @@ export const dashboardService = {
         const limit = Math.min(Number(query.limit) || 20, 50);
         const cursor = query.cursor ? new Date(query.cursor) : undefined;
 
-        const [transactions, expenses, settlements] = await Promise.all([
+        const [transactions, settlements] = await Promise.all([
             dashboardRepository.getUserTransactions(userId, cursor, limit),
-            dashboardRepository.getUserExpenses(userId, cursor, limit),
             dashboardRepository.getUserSettlements(userId, cursor, limit),
         ]);
 
         const feed = [
             ...mapTransactions(userId, transactions),
-            ...mapExpenses(userId, expenses),
             ...mapSettlements(userId, settlements),
         ];
 
