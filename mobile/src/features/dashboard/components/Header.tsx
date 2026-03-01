@@ -2,13 +2,11 @@ import { router } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { useGetNotifications } from "@/features/notifications/hooks/useGetNotifications";
+import { useUnreadCount } from "@/features/notifications/hooks/useUnreadCount";
 
 export const DashboardHeader = () => {
     const { user } = useUser();
-    const { data } = useGetNotifications();
-
-    const count = data?.filter((notification) => !notification.read).length;
+    const unread = useUnreadCount();
 
     return (
         <View className='flex flex-row items-center justify-between mb-5 px-0 py-3'>
@@ -38,14 +36,14 @@ export const DashboardHeader = () => {
                 onPress={() => router.push('/(app)/notifications')}
             >
                 <Ionicons
-                    name='notifications-outline'
+                    name={unread > 0 ? 'notifications' : 'notifications-outline'}
                     size={26}
                     color='#4A3428'
                 />
-                {count! !==  0 && (
+                {unread >  0 && (
                     <View className='absolute -top-1 -right-1 bg-text w-5 h-5 rounded-full flex items-center justify-center'>
                         <Text className='text-white text-xs'>
-                            {count}
+                            {unread}
                         </Text>
                     </View>
                 )}
