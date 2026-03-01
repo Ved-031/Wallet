@@ -1,4 +1,5 @@
 import { AppError } from '../../utils/AppError';
+import { NotificationType } from '@prisma/client';
 import { invitesRepository } from './invites.repository';
 
 export const invitesService = {
@@ -24,13 +25,20 @@ export const invitesService = {
         if (alreadyMember) throw new AppError('User is already in the group', 400);
 
         // create invite
-        await invitesRepository.createInvite(groupId, currentUserId, invitedUser.id);
+        const invite = await invitesRepository.createInvite(groupId, currentUserId, invitedUser.id);
 
         // notify invited user
         await invitesRepository.createNotification(
             invitedUser.id,
-            'Group Invitation',
-            `You were invited to join "${group.name}"`,
+            NotificationType.GROUP_INVITE,
+            `${group.creator.name} invited you`,
+            `Join ${group.name}`,
+            {
+                actorName: group.creator.name,
+                actorAvatar: group.creator.avatar,
+                groupName: group.name,
+                inviteId: invite.id,
+            }
         );
 
         return { message: 'Invite sent successfully' };
@@ -51,9 +59,16 @@ export const invitesService = {
 
         const accepted = await invitesRepository.acceptInvite(inviteId);
 
-        await invitesRepository.notifyInviter(
+        await invitesRepository.createNotification(
             invite.invitedBy,
-            'User accepted your group invitation',
+            NotificationType.INVITE_ACCEPTED,
+            `${invite.invited.name} joined`,
+            `${invite.group.name}`,
+            {
+                actorName: invite.invited.name,
+                actorAvatar: invite.invited.avatar,
+                groupName: invite.group.name,
+            }
         );
 
         return accepted;
@@ -70,9 +85,16 @@ export const invitesService = {
 
         const declined = await invitesRepository.declineInvite(inviteId);
 
-        await invitesRepository.notifyInviter(
+        await invitesRepository.createNotification(
             invite.invitedBy,
-            'User declined your group invitation',
+            NotificationType.INVITE_DECLINED,
+            `${invite.invited.name} declined`,
+            `${invite.group.name}`,
+            {
+                actorName: invite.invited.name,
+                actorAvatar: invite.invited.avatar,
+                groupName: invite.group.name,
+            }
         );
 
         return declined;

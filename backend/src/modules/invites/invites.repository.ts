@@ -1,5 +1,6 @@
 import { prisma } from '../../config/prisma';
 import { InviteStatus, NotificationType } from '@prisma/client';
+import { serializeMessage } from '../../utils/NotificationMessage';
 
 export const invitesRepository = {
     async findUserByEmail(email: string) {
@@ -26,13 +27,19 @@ export const invitesRepository = {
         });
     },
 
-    async createNotification(userId: number, title: string, message: string) {
+    async createNotification(
+        userId: number,
+        type: NotificationType,
+        title: string,
+        message: string,
+        meta?: any,
+    ) {
         return prisma.notification.create({
             data: {
                 userId,
-                type: NotificationType.GROUP_INVITE,
+                type,
                 title,
-                message,
+                message: serializeMessage(message, meta),
             },
         });
     },
@@ -40,6 +47,18 @@ export const invitesRepository = {
     async getGroup(groupId: number) {
         return prisma.group.findUnique({
             where: { id: groupId },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, email: true, avatar: true },
+                        },
+                    }
+                },
+                creator: {
+                    select: { id: true, name: true, email: true, avatar: true },
+                }
+            }
         });
     },
 
@@ -59,6 +78,11 @@ export const invitesRepository = {
     async getInviteById(inviteId: number) {
         return prisma.groupInvite.findUnique({
             where: { id: inviteId },
+            include: {
+                group: { select: { id: true, name: true } },
+                inviter: { select: { id: true, name: true, email: true, avatar: true } },
+                invited: { select: { id: true, name: true, email: true, avatar: true } },
+            }
         });
     },
 
@@ -84,17 +108,6 @@ export const invitesRepository = {
         return prisma.groupInvite.update({
             where: { id: inviteId },
             data: { status: InviteStatus.DECLINED },
-        });
-    },
-
-    async notifyInviter(userId: number, message: string) {
-        return prisma.notification.create({
-            data: {
-                userId,
-                type: NotificationType.GROUP_INVITE,
-                title: 'Group Invite Update',
-                message,
-            },
         });
     },
 };
