@@ -17,21 +17,28 @@ export const balanceService = {
         // 2️⃣ apply expenses
         const participants = await balanceRepository.getExpenseParticipants(groupId);
 
+        // Group participants by expense
+        const expenseMap: Record<number, typeof participants> = {};
         for (const p of participants) {
-            const paid = Number(p.paidShare);
-            const share = Number(p.share);
-            const payerId = p.expense.paidBy;
-            const userId = p.userId;
+            const eid = p.expense.id;
+            if (!expenseMap[eid]) expenseMap[eid] = [];
+            expenseMap[eid].push(p);
+        }
 
-            // payer should not owe himself
-            if (userId === payerId) continue;
+        for (const [_, expParticipants] of Object.entries(expenseMap)) {
+            const payerId = expParticipants[0].expense.paidBy;
 
-            // how much this participant owes payer
-            const debt = share - paid;
+            for (const p of expParticipants) {
+                const userId = p.userId;
+                const share = Number(p.share);
 
-            // participant owes payer
-            balances[userId] -= debt;
-            balances[payerId] += debt;
+                // Skip the payer — they don't owe themselves
+                if (userId === payerId) continue;
+
+                // This participant owes the payer their share
+                balances[userId] -= share;
+                balances[payerId] += share;
+            }
         }
 
         // 3️⃣ apply settlements
