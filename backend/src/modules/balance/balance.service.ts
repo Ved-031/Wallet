@@ -18,18 +18,28 @@ export const balanceService = {
         // 2️⃣ apply expenses
         const participants = await balanceRepository.getExpenseParticipants(groupId);
 
+        const expensesMap: Record<number, any[]> = {};
+
         for (const p of participants) {
-            const paid = Number(p.paidShare);
-            const owed = Number(p.share);
+            if (!expensesMap[p.expenseId]) expensesMap[p.expenseId] = [];
+            expensesMap[p.expenseId].push(p);
+        }
 
-            // user paid extra -> others owe him
-            if (paid > owed) {
-                balances[p.userId] += paid - owed;
-            }
+        for (const expenseParticipants of Object.values(expensesMap)) {
+            const payer = expenseParticipants.find(p => Number(p.paidShare) > 0);
 
-            // user underpaid -> he owes others
-            if (owed > paid) {
-                balances[p.userId] -= owed - paid;
+            if (!payer) continue;
+
+            const payerId = payer.userId;
+
+            for (const part of expenseParticipants) {
+                if (part.userId === payerId) continue;
+
+                const share = Number(part.share);
+
+                // participant owes payer
+                balances[part.userId] -= share;
+                balances[payerId] += share;
             }
         }
 
