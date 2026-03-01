@@ -30,7 +30,7 @@ export const GroupsPreview = () => {
             <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={data.slice(0, 3).reverse()}
+                data={data.reverse()}
                 keyExtractor={(item, index) => item.id ? String(item.id) : `group-${index}`}
                 contentContainerStyle={{ paddingRight: 16 }}
                 renderItem={({ item }) => (

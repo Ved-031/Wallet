@@ -36,10 +36,10 @@ export const GroupPreviewCard = ({ group, onPress }: Props) => {
 
             {/* Balance */}
             <Text className="text-textLight text-sm mt-1">
-                {balance === 0 ? 'All settled' : positive ? 'You owe' : 'You get'}
+                {balance === 0 ? 'All settled' : positive ? 'You get' : 'You owe'}
             </Text>
 
-            <Text className={cn('font-bold text-lg mt-0.5', positive ? 'text-red-600' : 'text-green-600')}>
+            <Text className={cn('font-bold text-lg mt-0.5', positive ? 'text-green-600' : 'text-red-600')}>
                 {formatCurrency(Math.abs(balance))}
             </Text>
         </Pressable>

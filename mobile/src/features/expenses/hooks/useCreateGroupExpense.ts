@@ -9,11 +9,11 @@ export const useCreateGroupExpense = (groupId: number) => {
 
         onMutate: async payload => {
             await queryClient.cancelQueries({ queryKey: ['group-expenses', groupId] });
-            await queryClient.cancelQueries({ queryKey: ['group-balances', groupId] });
+            await queryClient.cancelQueries({ queryKey: ['group-settlements', groupId] });
             await queryClient.cancelQueries({ queryKey: ['groups-preview'] });
 
             const previousExpenses = queryClient.getQueryData<any>(['group-expenses', groupId]);
-            const previousBalances = queryClient.getQueryData<any>(['group-balances', groupId]);
+            const previousBalances = queryClient.getQueryData<any>(['group-settlements', groupId]);
             const previousPreview = queryClient.getQueryData<any>(['groups-preview']);
 
             // ---------- TEMP EXPENSE ----------
@@ -92,7 +92,7 @@ export const useCreateGroupExpense = (groupId: number) => {
                 queryClient.setQueryData(['group-expenses', groupId], ctx.previousExpenses);
 
             if (ctx?.previousBalances)
-                queryClient.setQueryData(['group-balances', groupId], ctx.previousBalances);
+                queryClient.setQueryData(['group-settlements', groupId], ctx.previousBalances);
 
             if (ctx?.previousPreview)
                 queryClient.setQueryData(['groups-preview'], ctx.previousPreview);
@@ -100,7 +100,7 @@ export const useCreateGroupExpense = (groupId: number) => {
 
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['group-expenses', groupId] });
-            queryClient.invalidateQueries({ queryKey: ['group-balances', groupId] });
+            queryClient.invalidateQueries({ queryKey: ['group-settlements', groupId] });
             queryClient.invalidateQueries({ queryKey: ['groups-preview'] });
         },
     });

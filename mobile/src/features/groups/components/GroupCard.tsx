@@ -13,7 +13,7 @@ type Props = {
 export const GroupCard = ({ group }: Props) => {
     const statusText = group.balance === 0
         ? 'All settled'
-        : group.balance > 0
+        : group.balance < 0
             ? 'You owe total of'
             : 'You are owed total of';
 
@@ -24,8 +24,8 @@ export const GroupCard = ({ group }: Props) => {
     const color = group.isSettled
         ? 'text-textLight'
         : (group.youOwe ?? 0) > 0
-            ? 'text-green-600'
-            : 'text-red-500';
+            ? 'text-red-500'
+            : 'text-green-600';
 
     return (
         <Pressable
@@ -60,14 +60,14 @@ export const GroupCard = ({ group }: Props) => {
                         ? null
                         : group.balance > 0
                             ? <Ionicons
-                                name="arrow-down-outline"
-                                size={14}
-                                color={COLORS.expense}
-                            />
-                            : <Ionicons
                                 name="arrow-up-outline"
                                 size={14}
                                 color={COLORS.income}
+                            />
+                            : <Ionicons
+                                name="arrow-down-outline"
+                                size={14}
+                                color={COLORS.expense}
                             />
                     }
                     <Text className="text-textLight text-sm">

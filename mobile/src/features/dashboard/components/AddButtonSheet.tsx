@@ -57,6 +57,7 @@ export const AddButtonSheet = ({ ref }: Props) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
 
     const openBottomSheet = useCallback(() => {
+        ref.current?.close();
         bottomSheetRef.current?.snapToIndex(0);
     }, []);
 
