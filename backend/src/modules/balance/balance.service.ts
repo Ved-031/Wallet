@@ -5,7 +5,6 @@ export const balanceService = {
     async getGroupBalances(currentUserId: number, groupId: number) {
         // 1️⃣ verify membership
         const members = await balanceRepository.getGroupMembers(groupId);
-
         const memberIds = new Set(members.map(m => m.userId));
 
         if (!memberIds.has(currentUserId))
@@ -17,25 +16,22 @@ export const balanceService = {
 
         // 2️⃣ apply expenses
         const participants = await balanceRepository.getExpenseParticipants(groupId);
-        const expenseMap: Record<number, typeof participants> = {};
 
         for (const p of participants) {
-            const expId = p.expense.id;
-            if (!expenseMap[expId]) expenseMap[expId] = [];
-            expenseMap[expId].push(p);
-        }
+            const paid = Number(p.paidShare);
+            const share = Number(p.share);
+            const payerId = p.expense.paidBy;
+            const userId = p.userId;
 
-        for (const expParts of Object.values(expenseMap)) {
-            const payerId = expParts[0].expense.paidBy;
+            // payer should not owe himself
+            if (userId === payerId) continue;
 
-            for (const part of expParts) {
-                if (part.userId === payerId) continue;
+            // how much this participant owes payer
+            const debt = share - paid;
 
-                const share = Number(part.share);
-
-                balances[part.userId] -= share;
-                balances[payerId] += share;
-            }
+            // participant owes payer
+            balances[userId] -= debt;
+            balances[payerId] += debt;
         }
 
         // 3️⃣ apply settlements
