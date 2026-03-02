@@ -3,13 +3,18 @@ import { router } from 'expo-router';
 import { cn } from '@/shared/utils/cn';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
-import { Pressable, Text, View } from 'react-native';
+import { useLeaveGroup } from '../hooks/useLeaveGroup';
+import { useDeleteGroup } from '../hooks/useDeleteGroup';
+import { getErrorMessage } from '@/shared/utils/getErrorMsg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import InviteMemberSheet from '@/features/invites/components/InviteMemberSheet';
 
 type Props = {
     groupId: number;
     isAdmin: boolean;
+    setLeaveGroupError: (msg: string) => void;
+    setDeleteGroupError: (msg: string) => void;
     bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
@@ -17,29 +22,34 @@ type SheetActionItemProps = {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
     danger?: boolean;
+    loading?: boolean;
     onPress: () => void;
 };
 
-const SheetActionItem = ({ icon, label, danger, onPress }: SheetActionItemProps) => {
+const SheetActionItem = ({ icon, label, danger, loading, onPress }: SheetActionItemProps) => {
     return (
         <Pressable
             onPress={onPress}
-            className="flex-row items-center gap-4 py-2 px-2 active:opacity-60"
+            className="flex-row items-center justify-between py-2 px-2 active:opacity-60"
         >
-            <Ionicons
-                name={icon}
-                size={20}
-                color={danger ? "#ef4444" : "#374151"}
-            />
-
-            <Text
-                className={cn(
-                    "text-base font-medium",
-                    danger ? "text-red-500" : "text-text"
-                )}
-            >
-                {label}
-            </Text>
+            <View className='flex-row items-center gap-4'>
+                <Ionicons
+                    name={icon}
+                    size={20}
+                    color={danger ? "#ef4444" : "#374151"}
+                />
+                <Text
+                    className={cn(
+                        "text-base font-medium",
+                        danger ? "text-red-500" : "text-text"
+                    )}
+                >
+                    {label}
+                </Text>
+            </View>
+            {loading && (
+                <ActivityIndicator size={'small'} color={COLORS.primary} />
+            )}
         </Pressable>
     );
 };
@@ -54,8 +64,39 @@ const SheetSection = ({ title }: { title: string }) => {
     );
 };
 
-const GroupActionSheet = ({ groupId, isAdmin, bottomSheetRef }: Props) => {
+const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroupError, bottomSheetRef }: Props) => {
     const inviteSheetRef = useRef<BottomSheet>(null);
+
+    const leaveMutation = useLeaveGroup();
+    const deleteMutation = useDeleteGroup();
+
+    const handleLeave = async () => {
+        await leaveMutation.mutateAsync(groupId, {
+            onSuccess: () => {
+                setLeaveGroupError('');
+            },
+            onError: (error) => {
+                setLeaveGroupError(getErrorMessage(error));
+            }
+        });
+        bottomSheetRef.current?.close();
+        router.replace('/(app)/(tabs)/groups');
+    }
+
+    const handleDelete = async () => {
+        await deleteMutation.mutateAsync(groupId, {
+            onSuccess: () => {
+                setDeleteGroupError('');
+                bottomSheetRef.current?.close();
+
+            },
+            onError: (error) => {
+                setDeleteGroupError(getErrorMessage(error));
+                bottomSheetRef.current?.close();
+            }
+        });
+        router.replace('/(app)/(tabs)/groups');
+    }
 
     const go = (path: any) => {
         bottomSheetRef.current?.close();
@@ -118,14 +159,16 @@ const GroupActionSheet = ({ groupId, isAdmin, bottomSheetRef }: Props) => {
                                     icon='trash-outline'
                                     label='Delete Group'
                                     danger
-                                    onPress={() => { }}
+                                    loading={deleteMutation.isPending}
+                                    onPress={handleDelete}
                                 />
                             ) : (
                                 <SheetActionItem
                                     icon='exit-outline'
                                     label='Leave group'
                                     danger
-                                    onPress={() => { }}
+                                    loading={leaveMutation.isPending}
+                                    onPress={handleLeave}
                                 />
                             )}
                         </View>

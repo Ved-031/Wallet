@@ -1,12 +1,12 @@
 import * as Haptics from 'expo-haptics';
-import { useCallback, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useLocalSearchParams } from 'expo-router';
 import { COLORS } from '@/shared/constants/colors';
+import { useCallback, useRef, useState } from 'react';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
-import { mapGroupExpenseToUI } from '@/features/groups/mapGroupExpense';
 import { GroupHeader } from '@/features/groups/components/GroupHeader';
+import { mapGroupExpenseToUI } from '@/features/groups/mapGroupExpense';
 import GroupActionSheet from '@/features/groups/components/GroupActionSheet';
 import { useGetGroupDetails } from '@/features/groups/hooks/useGetGroupDetails';
 import { GroupExpenseItem } from '@/features/groups/components/GroupExpenseItem';
@@ -17,6 +17,9 @@ import { ActivityIndicator, View, Text, Pressable, ScrollView } from 'react-nati
 
 export default function GroupDetailsScreen() {
     const bottomSheetRef = useRef<BottomSheet>(null);
+
+    const [leaveGroupError, setLeaveGroupError] = useState<string | null>(null);
+    const [deleteGroupError, setDeleteGroupError] = useState<string | null>(null);
 
     const openBottomSheet = useCallback(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -50,11 +53,60 @@ export default function GroupDetailsScreen() {
                 <GroupHeader
                     name={group.name}
                     isAdmin={isAdmin}
-                    onLeave={() => { }}
-                    onDelete={() => { }}
+                    groupId={groupId}
+                    setLeaveGroupError={setLeaveGroupError}
+                    setDeleteGroupError={setDeleteGroupError}
                 />
 
                 <View className='border-b-[0.5px] border-border mb-6' />
+
+                {!!leaveGroupError && (
+                    <View className='px-5 mb-4'>
+                        <View className='flex-row items-center justify-between bg-expense/10 px-4 py-2 rounded-lg'>
+                            <View className='flex-row items-center gap-1'>
+                                <Ionicons
+                                    name='alert-circle-outline'
+                                    size={20}
+                                    color={COLORS.expense}
+                                />
+                                <Text className='text-expense font-medium'>
+                                    {leaveGroupError}
+                                </Text>
+                            </View>
+                            <Pressable onPress={() => setLeaveGroupError('')}>
+                                <Ionicons
+                                    name='close'
+                                    size={20}
+                                    color={COLORS.expense}
+                                />
+                            </Pressable>
+                        </View>
+                    </View>
+                )}
+
+                {!!deleteGroupError && (
+                    <View className='px-5 mb-4'>
+                        <View className='flex-row items-center justify-between bg-expense/10 px-4 py-2 rounded-lg'>
+                            <View className='flex-row items-center gap-1'>
+                                <Ionicons
+                                    name='alert-circle-outline'
+                                    size={20}
+                                    color={COLORS.expense}
+                                />
+                                <Text className='text-expense font-medium'>
+                                    {deleteGroupError}
+                                </Text>
+                            </View>
+                            <Pressable onPress={() => setDeleteGroupError('')}>
+                                <Ionicons
+                                    name='close'
+                                    size={20}
+                                    color={COLORS.expense}
+                                />
+                            </Pressable>
+                        </View>
+                    </View>
+                )}
 
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30, gap: 16 }}>
                     <MyBalancesSection groupId={groupId} />
@@ -94,6 +146,8 @@ export default function GroupDetailsScreen() {
                 groupId={groupId}
                 isAdmin={isAdmin}
                 bottomSheetRef={bottomSheetRef}
+                setLeaveGroupError={setLeaveGroupError}
+                setDeleteGroupError={setDeleteGroupError}
             />
         </>
     );
