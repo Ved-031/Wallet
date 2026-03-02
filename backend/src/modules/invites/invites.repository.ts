@@ -1,6 +1,6 @@
 import { prisma } from '../../config/prisma';
-import { InviteStatus, NotificationType } from '@prisma/client';
 import { serializeMessage } from '../../utils/NotificationMessage';
+import { InviteStatus, NotificationType, Prisma, PrismaClient } from '@prisma/client';
 
 export const invitesRepository = {
     async findUserByEmail(email: string) {
@@ -53,12 +53,12 @@ export const invitesRepository = {
                         user: {
                             select: { id: true, name: true, email: true, avatar: true },
                         },
-                    }
+                    },
                 },
                 creator: {
                     select: { id: true, name: true, email: true, avatar: true },
-                }
-            }
+                },
+            },
         });
     },
 
@@ -82,6 +82,17 @@ export const invitesRepository = {
                 group: { select: { id: true, name: true } },
                 inviter: { select: { id: true, name: true, email: true, avatar: true } },
                 invited: { select: { id: true, name: true, email: true, avatar: true } },
+            },
+        });
+    },
+
+    async deleteInviteNotification(inviteId: number, db: Prisma.TransactionClient | PrismaClient = prisma) {
+        return db.notification.deleteMany({
+            where: {
+                type: 'GROUP_INVITE',
+                message: {
+                    contains: `"inviteId":${inviteId}`
+                }
             }
         });
     },
@@ -92,6 +103,8 @@ export const invitesRepository = {
                 where: { id: inviteId },
                 data: { status: InviteStatus.ACCEPTED },
             });
+
+            await this.deleteInviteNotification(inviteId, tx);
 
             await tx.groupMember.create({
                 data: {
@@ -105,9 +118,41 @@ export const invitesRepository = {
     },
 
     async declineInvite(inviteId: number) {
-        return prisma.groupInvite.update({
-            where: { id: inviteId },
-            data: { status: InviteStatus.DECLINED },
+        return prisma.$transaction(async tx => {
+            await tx.groupInvite.update({
+                where: { id: inviteId },
+                data: { status: InviteStatus.DECLINED },
+            });
+
+            await this.deleteInviteNotification(inviteId, tx);
+        });
+    },
+
+    async getGroupPendingInvites(groupId: number) {
+        return prisma.groupInvite.findMany({
+            where: {
+                groupId,
+                status: InviteStatus.PENDING,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            include: {
+                invited: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                    },
+                },
+                inviter: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
         });
     },
 };

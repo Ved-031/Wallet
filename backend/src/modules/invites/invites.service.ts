@@ -38,7 +38,7 @@ export const invitesService = {
                 actorAvatar: group.creator.avatar,
                 groupName: group.name,
                 inviteId: invite.id,
-            }
+            },
         );
 
         return { message: 'Invite sent successfully' };
@@ -68,7 +68,7 @@ export const invitesService = {
                 actorName: invite.invited.name,
                 actorAvatar: invite.invited.avatar,
                 groupName: invite.group.name,
-            }
+            },
         );
 
         return accepted;
@@ -94,9 +94,26 @@ export const invitesService = {
                 actorName: invite.invited.name,
                 actorAvatar: invite.invited.avatar,
                 groupName: invite.group.name,
-            }
+            },
         );
 
         return declined;
+    },
+
+    async getGroupInvites(currentUserId: number, groupId: number) {
+        const group = await invitesRepository.getGroup(groupId);
+        if (!group) throw new AppError('Group not found', 404);
+
+        const isMember = await invitesRepository.isMember(groupId, currentUserId);
+        if (!isMember) throw new AppError('You are not part of this group', 403);
+
+        const invites = await invitesRepository.getGroupPendingInvites(groupId);
+
+        return invites.map(invite => ({
+            id: invite.id,
+            createdAt: invite.createdAt,
+            invitedUser: invite.invited,
+            invitedBy: invite.inviter,
+        }));
     },
 };

@@ -133,3 +133,17 @@ export const declineInvite = asyncHandler(async (req: AuthenticatedRequest, res:
         }),
     );
 });
+
+export const getPendingInvites = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.id;
+    const groupId = Number(req.params.groupId);
+
+    const invites = await invitesService.getGroupInvites(userId, groupId);
+
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            data: invites,
+        }),
+    );
+});
