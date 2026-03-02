@@ -30,10 +30,9 @@ import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
  */
 export const sendInvite = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
-    const groupId = Number(req.params.groupId);
-    const { email } = req.body;
+    const { email, groupId } = req.body;
 
-    const result = await invitesService.sendInvite(currentUserId, groupId, email);
+    const result = await invitesService.sendInvite(currentUserId, Number(groupId), email);
 
     res.status(200).json(
         new ApiResponse({
