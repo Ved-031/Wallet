@@ -1,4 +1,8 @@
-export type NotificationType = 'GROUP_INVITE' | 'INVITE_ACCEPTED' | 'INVITE_DECLINED' | 'SETTLEMENT';
+export type NotificationType =
+    | 'GROUP_INVITE'
+    | 'INVITE_ACCEPTED'
+    | 'INVITE_DECLINED'
+    | 'SETTLEMENT';
 
 export type Notification = {
     id: number;
@@ -7,8 +11,10 @@ export type Notification = {
     type: NotificationType;
     read: boolean;
     createdAt: string;
-    actorName?: string;
-    actorAvatar?: string;
-    groupName?: string;
-    inviteId?: number;
-}
+    meta?: {
+        actorName?: string;
+        actorAvatar?: string;
+        groupName?: string;
+        inviteId?: number;
+    };
+};

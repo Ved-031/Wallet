@@ -10,7 +10,7 @@ type Props = {
 
 export const GroupPreviewCard = ({ group, onPress }: Props) => {
     const { name, balance, memberAvatars } = group;
-    const positive = balance > 0;
+    const positive = balance >= 0;
 
     return (
         <Pressable
@@ -40,7 +40,7 @@ export const GroupPreviewCard = ({ group, onPress }: Props) => {
             </Text>
 
             <Text className={cn('font-bold text-lg mt-0.5', positive ? 'text-green-600' : 'text-red-600')}>
-                {formatCurrency(Math.abs(balance))}
+                {balance === 0 ? formatCurrency(0) : formatCurrency(Math.abs(balance))}
             </Text>
         </Pressable>
     );

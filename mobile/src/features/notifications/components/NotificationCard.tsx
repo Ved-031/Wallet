@@ -8,15 +8,17 @@ import { useReadNotification } from "../hooks/useReadNotification";
 import { useRespondInvite } from "@/features/invites/hooks/useRespondInvite";
 
 const buildMessage = (item: Notification) => {
+    const meta = item.meta ?? {};
+
     switch (item.type) {
         case "GROUP_INVITE":
-            return `invited you to join ${item.groupName}`;
+            return `${meta.actorName ?? "Someone"} invited you to join ${meta.groupName ?? "a group"}`;
 
         case "INVITE_ACCEPTED":
-            return `${item.actorName} joined ${item.groupName}`;
+            return `${meta.actorName ?? "Someone"} joined ${meta.groupName ?? ""}`;
 
         case "INVITE_DECLINED":
-            return `${item.actorName} declined your invite to ${item.groupName}`;
+            return `${meta.actorName ?? "Someone"} declined your invite to ${meta.groupName ?? ""}`;
 
         case "SETTLEMENT":
             return item.message;
@@ -24,13 +26,18 @@ const buildMessage = (item: Notification) => {
         default:
             return item.message;
     }
-}
+};
 
 export const NotificationCard = ({ item }: { item: Notification }) => {
     const { readOne } = useReadNotification();
     const { accept, decline } = useRespondInvite();
 
-    const isActionableInvite = item.type === "GROUP_INVITE" && item.inviteId;
+    const inviteId = item.meta?.inviteId;
+    const isActionableInvite = item.type === "GROUP_INVITE" && inviteId;
+
+    const isAccepting = accept.isPending;
+    const isDeclining = decline.isPending;
+    const isLoading = isAccepting || isDeclining;
 
     const handlePress = () => {
         if (!item.read) readOne.mutate(item.id);
@@ -47,9 +54,9 @@ export const NotificationCard = ({ item }: { item: Notification }) => {
             {/* HEADER */}
             <View className="flex-row items-start gap-3">
                 <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center">
-                    {item.actorAvatar ? (
+                    {item.meta?.actorAvatar ? (
                         <Image
-                            source={{ uri: item.actorAvatar }}
+                            source={{ uri: item.meta?.actorAvatar }}
                             className="w-10 h-10 rounded-full"
                         />
                     ) : (
@@ -84,15 +91,17 @@ export const NotificationCard = ({ item }: { item: Notification }) => {
             {isActionableInvite && (
                 <View className="flex-row gap-3 mt-4">
                     <Pressable
-                        onPress={() => accept.mutate(item.id)}
-                        className="flex-1 bg-primary py-3 rounded-xl items-center"
+                        disabled={isLoading}
+                        onPress={() => accept.mutate(inviteId)}
+                        className="flex-1 bg-primary py-3 rounded-xl items-center disabled:opacity-50"
                     >
                         <Text className="text-white font-semibold">Accept</Text>
                     </Pressable>
 
                     <Pressable
-                        onPress={() => decline.mutate(item.id)}
-                        className="flex-1 border border-border py-3 rounded-xl items-center"
+                        disabled={isLoading}
+                        onPress={() => decline.mutate(inviteId)}
+                        className="flex-1 border border-border py-3 rounded-xl items-center disabled:opacity-50"
                     >
                         <Text className="text-text font-semibold">Decline</Text>
                     </Pressable>

@@ -1,42 +1,46 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Notification } from '@/features/notifications/types';
 import { acceptInvite, declineInvite } from '../api/respondInvite';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useRespondInvite = () => {
     const qc = useQueryClient();
 
-    const optimisticRemove = async (inviteId: number) => {
-        await qc.cancelQueries({ queryKey: ['invites'] });
+    const optimisticRemoveNotification = async (inviteId: number) => {
+        await qc.cancelQueries({ queryKey: ['notifications'] });
 
-        const previous = qc.getQueryData<any[]>(['invites']);
+        const previous = qc.getQueryData<Notification[]>(['notifications']);
 
-        qc.setQueryData(['invites'], (old: any[] = []) => old.filter(i => i.id !== inviteId));
+        qc.setQueryData<Notification[]>(
+            ['notifications'],
+            old => old?.filter(n => n.meta?.inviteId !== inviteId) || [],
+        );
 
         return { previous };
     };
 
     const rollback = (context: any) => {
         if (context?.previous) {
-            qc.setQueryData(['invites'], context.previous);
+            qc.setQueryData(['notifications'], context.previous);
         }
     };
 
     const onSettled = () => {
+        qc.invalidateQueries({ queryKey: ['notifications'] });
         qc.invalidateQueries({ queryKey: ['groups-preview'] });
         qc.invalidateQueries({ queryKey: ['dashboard-groups'] });
-        qc.invalidateQueries({ queryKey: ['invites'] });
-        qc.invalidateQueries({ queryKey: ['notifications'] });
+        qc.invalidateQueries({ queryKey: ['group-invites'] });
     };
 
     const accept = useMutation({
         mutationFn: acceptInvite,
-        onMutate: optimisticRemove,
+        onMutate: optimisticRemoveNotification,
         onError: (_err, _vars, ctx) => rollback(ctx),
         onSettled,
     });
 
     const decline = useMutation({
         mutationFn: declineInvite,
-        onMutate: optimisticRemove,
+        onMutate: optimisticRemoveNotification,
         onError: (_err, _vars, ctx) => rollback(ctx),
         onSettled,
     });

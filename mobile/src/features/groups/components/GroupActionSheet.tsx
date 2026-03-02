@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { router } from 'expo-router';
-import { IoniconName } from '@/types';
+import { cn } from '@/shared/utils/cn';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import { Pressable, Text, View } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import InviteMemberSheet from '@/features/invites/components/InviteMemberSheet';
 
 type Props = {
     groupId: number;
@@ -12,100 +13,130 @@ type Props = {
     bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
-type ActionItemProps = {
-    icon: IoniconName;
+type SheetActionItemProps = {
+    icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    color?: string;
+    danger?: boolean;
     onPress: () => void;
-}
+};
 
-const ActionItem = ({ icon, label, color = COLORS.text, onPress }: ActionItemProps) => {
+const SheetActionItem = ({ icon, label, danger, onPress }: SheetActionItemProps) => {
     return (
         <Pressable
             onPress={onPress}
-            className="flex-row items-center justify-between py-1.5 rounded-2xl"
+            className="flex-row items-center gap-4 py-2 px-2 active:opacity-60"
         >
-            <View className="flex-row items-center gap-4">
-                <View className="w-11 h-11 rounded-full bg-border/40 items-center justify-center border border-border">
-                    <Ionicons
-                        name={icon}
-                        size={22}
-                        color={color}
-                    />
-                </View>
-                <Text className="text-text text-[16px] font-medium">
-                    {label}
-                </Text>
-            </View>
             <Ionicons
-                name="chevron-forward-outline"
+                name={icon}
                 size={20}
-                color={COLORS.textLight}
+                color={danger ? "#ef4444" : "#374151"}
             />
+
+            <Text
+                className={cn(
+                    "text-base font-medium",
+                    danger ? "text-red-500" : "text-text"
+                )}
+            >
+                {label}
+            </Text>
         </Pressable>
     );
-}
+};
+
+const SheetSection = ({ title }: { title: string }) => {
+    return (
+        <View className="pt-5 pb-2">
+            <Text className="text-textLight text-xs uppercase tracking-wider">
+                {title}
+            </Text>
+        </View>
+    );
+};
 
 const GroupActionSheet = ({ groupId, isAdmin, bottomSheetRef }: Props) => {
+    const inviteSheetRef = useRef<BottomSheet>(null);
+
     const go = (path: any) => {
         bottomSheetRef.current?.close();
         router.push(path);
     }
 
     return (
-        <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            snapPoints={['40%']}
-            enablePanDownToClose
-            backgroundStyle={{
-                backgroundColor: COLORS.card,
-                borderRadius: 35,
-                overflow: 'hidden',
-                borderWidth: 2,
-                borderColor: COLORS.border,
-            }}
-        >
-            <BottomSheetView style={{ flex: 1, paddingTop: 5, paddingHorizontal: 12, gap: 10 }}>
-                <View className='bg-card rounded-t-3xl px-5 pt-6 pb-10'>
-                    <View className='gap-3'>
-                        <ActionItem
-                            icon='receipt-outline'
-                            label='Add Expense'
-                            onPress={() => go(`/(app)/groups/${groupId}/add-expense`)}
-                        />
-                        <View className='h-[0.5px] bg-border' />
-                        <ActionItem
-                            icon='swap-horizontal-outline'
-                            label='Settle Up'
-                            onPress={() => go(`/(app)/groups/${groupId}/settle`)}
-                        />
-                        <View className='h-[0.5px] bg-border' />
-                        <ActionItem
-                            icon='person-add-outline'
-                            label='Add Member'
-                            onPress={() => go(`/(app)/groups/${groupId}/add-member`)}
-                        />
-                        <View className='h-[0.4px] bg-border' />
-                        {isAdmin ? (
-                            <ActionItem
-                                icon='trash-outline'
-                                label='Delete Group'
-                                color={COLORS.expense}
-                                onPress={() => go(`/(app)/groups/${groupId}/delete`)}
+        <>
+            <BottomSheet
+                ref={bottomSheetRef}
+                index={-1}
+                snapPoints={['40%']}
+                enablePanDownToClose
+                backgroundStyle={{
+                    backgroundColor: COLORS.card,
+                    borderRadius: 35,
+                    overflow: 'hidden',
+                    borderWidth: 2,
+                    borderColor: COLORS.border,
+                }}
+            >
+                <BottomSheetView style={{ flex: 1, paddingHorizontal: 12, gap: 10 }}>
+                    <View className='bg-card rounded-t-3xl px-5 pt-2 pb-10'>
+                        <View className='gap-3'>
+                            {/* MAIN ACTIONS */}
+                            <SheetSection title='Actions' />
+                            <SheetActionItem
+                                icon='receipt-outline'
+                                label='Add Expense'
+                                onPress={() => go(`/(app)/groups/${groupId}/add-expense`)}
                             />
-                        ) : (
-                            <ActionItem
-                                icon='exit-outline'
-                                label='Leave Group'
-                                color={COLORS.expense}
-                                onPress={() => go(`/(app)/groups/${groupId}/leave`)}
+                            <SheetActionItem
+                                icon='person-add-outline'
+                                label='Add Member'
+                                onPress={() => {
+                                    bottomSheetRef.current?.close();
+                                    setTimeout(() => {
+                                        inviteSheetRef.current?.expand();
+                                    }, 250);
+                                }}
                             />
-                        )}
+
+                            {/* MANAGEMENT */}
+                            <SheetSection title='Manager' />
+                            <SheetActionItem
+                                icon='create-outline'
+                                label='Rename group'
+                                onPress={() => { }}
+                            />
+                            <SheetActionItem
+                                icon='time-outline'
+                                label='Settlement History'
+                                onPress={() => { }}
+                            />
+
+                            {/* DANGER ZONE */}
+                            <SheetSection title='Danger zone' />
+                            {isAdmin ? (
+                                <SheetActionItem
+                                    icon='trash-outline'
+                                    label='Delete Group'
+                                    danger
+                                    onPress={() => { }}
+                                />
+                            ) : (
+                                <SheetActionItem
+                                    icon='exit-outline'
+                                    label='Leave group'
+                                    danger
+                                    onPress={() => { }}
+                                />
+                            )}
+                        </View>
                     </View>
-                </View>
-            </BottomSheetView>
-        </BottomSheet>
+                </BottomSheetView>
+            </BottomSheet>
+            <InviteMemberSheet
+                groupId={groupId}
+                bottomSheetRef={inviteSheetRef}
+            />
+        </>
     )
 }
 

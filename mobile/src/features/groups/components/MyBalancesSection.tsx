@@ -23,11 +23,7 @@ export const MyBalancesSection = ({ groupId }: { groupId: number }) => {
         (s: any) => s.from.userId === me.id || s.to.userId === me.id
     );
 
-    if (mySettlements.length === 0) return (
-        <View className="px-5 py-4">
-            <Text className="text-textLight text-center">All settled 🎉</Text>
-        </View>
-    );
+    if (mySettlements.length === 0) return null;
 
     return (
         <View className="px-0 py-4 gap-3">

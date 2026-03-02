@@ -59,16 +59,12 @@ export default function GroupDetailsScreen() {
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30, gap: 16 }}>
                     <MyBalancesSection groupId={groupId} />
 
-                    <View className='border-b-[0.5px] border-border' />
-
                     <GroupMembersSection
                         group={group}
                         isAdmin={isAdmin}
                     />
 
-                    <View className='border-b-[0.5px] border-border' />
-
-                    <View>
+                    <View className='mt-5'>
                         <Text className="text-text text-lg font-semibold mb-5">
                             Expenses
                         </Text>

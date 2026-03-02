@@ -3,6 +3,8 @@ import { Group } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, Image } from 'react-native';
 import { COLORS } from '@/shared/constants/colors';
+import { useGroupInvites } from '@/features/invites/hooks/useGroupInvites';
+import PendingInviteRow from '@/features/invites/components/PendingInviteRow';
 
 interface Props {
     group: Group;
@@ -43,12 +45,15 @@ const GroupMemberItem = ({ member, isAdmin }: { member: Group['members'][0], isA
 }
 
 const GroupMembersSection = ({ group, isAdmin }: Props) => {
+    const { data: invites } = useGroupInvites(group.id);
+
     return (
-        <View>
+        <View className='bg-card p-4 rounded-2xl border border-border'>
             <Text className="text-text text-lg font-semibold mb-4">
                 Members
             </Text>
 
+            {/* ACTIVE MEMBERS */}
             {group.members.map(member => (
                 <GroupMemberItem
                     key={member.userId}
@@ -56,6 +61,22 @@ const GroupMembersSection = ({ group, isAdmin }: Props) => {
                     isAdmin={isAdmin}
                 />
             ))}
+
+            {/* PENDING MEMBERS */}
+            {invites?.length > 0 && (
+                <>
+                    <View className='h-[0.5px] bg-border mb-4 mt-2' />
+                    <Text className='text-text font-medium mb-2'>
+                        Invited
+                    </Text>
+                    {invites?.map((invite: any) => (
+                        <PendingInviteRow
+                            key={invite.id}
+                            invite={invite}
+                        />
+                    ))}
+                </>
+            )}
         </View>
     )
 }
