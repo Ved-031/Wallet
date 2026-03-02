@@ -7,7 +7,7 @@ const router = Router();
 router.use(protectRoute);
 
 router.post('/:groupId', sendInvite);
-router.post('/:groupId/pending-invites', getPendingInvites);
+router.get('/:groupId/pending-invites', getPendingInvites);
 router.get('/', getMyInvites);
 router.post('/:inviteId/accept', acceptInvite);
 router.post('/:inviteId/decline', declineInvite);
