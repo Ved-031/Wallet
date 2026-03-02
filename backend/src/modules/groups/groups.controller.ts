@@ -159,6 +159,40 @@ export const removeMember = asyncHandler(async (req: AuthenticatedRequest, res: 
     );
 });
 
+/**
+ * @swagger
+ * /groups/{groupId}/delete:
+ *   post:
+ *     summary: Delete a group (only if balance is zero and user is admin)
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Delete group successfully
+ *       400:
+ *         description: Cannot delete group with pending balance
+ */
+export const deleteGroup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const currentUserId = req.user!.id;
+    const groupId = Number(req.params.groupId);
+
+    const result = await groupService.deleteGroup(currentUserId, groupId);
+
+    res.status(200).json(
+        new ApiResponse({
+            success: true,
+            ...result,
+        }),
+    );
+});
+
 export const getGroupActivity = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
     const groupId = Number(req.params.groupId);

@@ -52,6 +52,14 @@ export const groupRepository = {
         });
     },
 
+    async deleteGroup(groupId: number) {
+        return prisma.group.delete({
+            where: {
+                id: groupId,
+            },
+        });
+    },
+
     async getGroupActivity(groupId: number, userId: number, cursor?: Date, limit = 20) {
         const [expenses, settlements] = await Promise.all([
             // ALL EXPENSES

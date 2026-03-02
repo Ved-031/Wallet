@@ -74,6 +74,23 @@ export const groupService = {
         return { message: 'Member removed successfully' };
     },
 
+    async deleteGroup(currentUserId: number, groupId: number) {
+        const group = await groupRepository.findGroupById(groupId);
+        if (!group) throw new AppError('Group not found', 404);
+
+        const me = group.members.find(m => m.userId === currentUserId);
+        if (!me || me.role !== 'ADMIN') throw new AppError('Only admin can delete group', 403);
+
+        const balance = await balanceService.getGroupBalances(currentUserId, groupId);
+
+        const unsettled = balance.find(b => b.balance !== 0);
+        if (unsettled) throw new AppError('Cannot delete group with unsettled balances', 400);
+
+        await groupRepository.deleteGroup(groupId);
+
+        return { message: 'Group deleted successfully' };
+    },
+
     async getGroupActivity(userId: number, groupId: number, query: any) {
         const cursor = query.cursor ? new Date(query.cursor) : undefined;
         const limit = Math.min(Number(query.limit) || 20, 50);
