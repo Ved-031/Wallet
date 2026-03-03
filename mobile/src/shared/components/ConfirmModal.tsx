@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { IoniconName } from '@/types';
 
 type Props = {
     visible: boolean;
@@ -16,6 +17,7 @@ type Props = {
     description?: string;
     confirmText?: string;
     cancelText?: string;
+    icon?: IoniconName;
     variant?: 'danger' | 'default';
     loading?: boolean;
     onConfirm: () => void;
@@ -26,6 +28,7 @@ export default function ConfirmModal({
     visible,
     title,
     description,
+    icon,
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     variant = 'default',
@@ -53,10 +56,9 @@ export default function ConfirmModal({
                                     }`}
                             >
                                 <Ionicons
-                                    name={
-                                        isDanger
-                                            ? 'warning-outline'
-                                            : 'help-circle-outline'
+                                    name={icon ?? isDanger
+                                        ? 'warning-outline'
+                                        : 'help-circle-outline'
                                     }
                                     size={26}
                                     color={

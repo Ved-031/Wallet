@@ -30,8 +30,9 @@ export const MyBalancesSection = ({ groupId }: { groupId: number }) => {
             {mySettlements.map((s: any, i: number) => (
                 <BalanceRow
                     key={i}
-                    meId={me.id}
+                    me={me}
                     settlement={s}
+                    groupId={groupId}
                 />
             ))}
         </View>
