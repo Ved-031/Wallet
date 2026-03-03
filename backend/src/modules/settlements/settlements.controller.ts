@@ -34,12 +34,12 @@ import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
  */
 export const createSettlement = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const currentUserId = req.user!.id;
-    const { groupId, paidBy, paidTo, amount, note } = req.body;
+    const { groupId, paidTo, amount, note } = req.body;
 
     const settlement = await settlementsService.createSettlement(
         currentUserId,
         Number(groupId),
-        Number(paidBy),
+        currentUserId,
         Number(paidTo),
         Number(amount),
         note,
