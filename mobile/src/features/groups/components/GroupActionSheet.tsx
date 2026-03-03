@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import { useLeaveGroup } from '../hooks/useLeaveGroup';
 import { useDeleteGroup } from '../hooks/useDeleteGroup';
+import ConfirmModal from '@/shared/components/ConfirmModal';
 import { getErrorMessage } from '@/shared/utils/getErrorMsg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
@@ -65,6 +66,9 @@ const SheetSection = ({ title }: { title: string }) => {
 };
 
 const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroupError, bottomSheetRef }: Props) => {
+    const [confirmLeave, setConfirmLeave] = React.useState(false);
+    const [confirmDelete, setConfirmDelete] = React.useState(false);
+
     const inviteSheetRef = useRef<BottomSheet>(null);
 
     const leaveMutation = useLeaveGroup();
@@ -74,9 +78,11 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
         await leaveMutation.mutateAsync(groupId, {
             onSuccess: () => {
                 setLeaveGroupError('');
+                setConfirmLeave(false);
             },
             onError: (error) => {
                 setLeaveGroupError(getErrorMessage(error));
+                setConfirmLeave(false);
             }
         });
         bottomSheetRef.current?.close();
@@ -87,12 +93,11 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
         await deleteMutation.mutateAsync(groupId, {
             onSuccess: () => {
                 setDeleteGroupError('');
-                bottomSheetRef.current?.close();
-
+                setConfirmDelete(false);
             },
             onError: (error) => {
                 setDeleteGroupError(getErrorMessage(error));
-                bottomSheetRef.current?.close();
+                setConfirmDelete(false);
             }
         });
         router.replace('/(app)/(tabs)/groups');
@@ -160,7 +165,10 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
                                     label='Delete Group'
                                     danger
                                     loading={deleteMutation.isPending}
-                                    onPress={handleDelete}
+                                    onPress={() => {
+                                        setConfirmDelete(true);
+                                        bottomSheetRef.current?.close();
+                                    }}
                                 />
                             ) : (
                                 <SheetActionItem
@@ -168,7 +176,10 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
                                     label='Leave group'
                                     danger
                                     loading={leaveMutation.isPending}
-                                    onPress={handleLeave}
+                                    onPress={() => {
+                                        setConfirmLeave(true);
+                                        bottomSheetRef.current?.close();
+                                    }}
                                 />
                             )}
                         </View>
@@ -179,6 +190,28 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
                 groupId={groupId}
                 bottomSheetRef={inviteSheetRef}
             />
+            {isAdmin ? (
+                <ConfirmModal
+                    visible={confirmDelete}
+                    variant="danger"
+                    title="Delete Group?"
+                    description="This action cannot be undone."
+                    confirmText="Delete"
+                    loading={deleteMutation.isPending}
+                    onCancel={() => setConfirmDelete(false)}
+                    onConfirm={handleDelete}
+                />
+            ) : (
+                <ConfirmModal
+                    visible={confirmLeave}
+                    title="Leave Group?"
+                    description="You can only leave if all balances are settled."
+                    confirmText="Leave"
+                    loading={leaveMutation.isPending}
+                    onCancel={() => setConfirmLeave(false)}
+                    onConfirm={handleLeave}
+                />
+            )}
         </>
     )
 }
