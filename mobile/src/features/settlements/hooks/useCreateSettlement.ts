@@ -21,6 +21,7 @@ export const useCreateSettlement = (groupId: number) => {
 
             // Activity
             qc.invalidateQueries({ queryKey: ['dashboard-activity'] });
+            qc.invalidateQueries({ queryKey: ['group-activity', groupId] });
         },
     });
 };

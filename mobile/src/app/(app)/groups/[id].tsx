@@ -10,10 +10,11 @@ import { mapGroupExpenseToUI } from '@/features/groups/mapGroupExpense';
 import GroupActionSheet from '@/features/groups/components/GroupActionSheet';
 import { useGetGroupDetails } from '@/features/groups/hooks/useGetGroupDetails';
 import { GroupExpenseItem } from '@/features/groups/components/GroupExpenseItem';
-import { useGetGroupExpenses } from '@/features/groups/hooks/useGetGroupExpenses';
+import { useGetGroupActivity } from '@/features/groups/hooks/useGetGroupActivity';
 import { MyBalancesSection } from '@/features/groups/components/MyBalancesSection';
 import GroupMembersSection from '@/features/groups/components/GroupMembersSection';
 import { ActivityIndicator, View, Text, Pressable, ScrollView } from 'react-native';
+import { GroupSettlementItem } from '@/features/groups/components/GroupSettlementItem';
 
 export default function GroupDetailsScreen() {
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -31,11 +32,14 @@ export default function GroupDetailsScreen() {
 
     const { data: user } = useCurrentUser();
     const { data: group, isLoading } = useGetGroupDetails(groupId);
-    const { data: expenseRes, isLoading: isLoadingExpenses } = useGetGroupExpenses(groupId);
+    const { data: activityPages, isLoading: isLoadingActivity } = useGetGroupActivity(groupId);
 
-    const expenses = expenseRes?.data?.map(exp => mapGroupExpenseToUI(exp, user?.id ?? 0)) ?? [];
+    const activity =
+        activityPages?.pages.flatMap(page => page.data) ?? [];
+    const expenses = activity.filter(item => item.type === 'EXPENSE');
+    const settlements = activity.filter(item => item.type === 'SETTLEMENT');
 
-    if (isLoading || isLoadingExpenses || !group) {
+    if (isLoading || isLoadingActivity || !group) {
         return (
             <View className="flex-1 bg-background items-center justify-center">
                 <ActivityIndicator size={'small'} color={COLORS.primary} />
@@ -116,23 +120,52 @@ export default function GroupDetailsScreen() {
                         isAdmin={isAdmin}
                     />
 
-                    <View className='mt-5'>
-                        <Text className="text-text text-lg font-semibold mb-5">
+                    <View className="mt-5">
+                        <Text className="text-text text-lg font-semibold mb-4">
                             Expenses
                         </Text>
 
-                        <View className="gap-1">
-                            {expenses.length === 0 ? (
+                        {expenses.length === 0 ? (
+                            <Text className="text-textLight text-center py-6">
+                                No expenses yet
+                            </Text>
+                        ) : (
+                            <View className="gap-2">
+                                {expenses.map((item: any) => (
+                                    <GroupExpenseItem
+                                        key={item.id}
+                                        item={mapGroupExpenseToUI(
+                                            item.data,
+                                            user?.id ?? 0
+                                        )}
+                                    />
+                                ))}
+                            </View>
+                        )}
+                    </View>
+
+                    {settlements.length > 0 && (
+                        <View className="mt-4">
+                            <Text className="text-text text-lg font-semibold mb-4">
+                                Settlements
+                            </Text>
+                            {settlements.length === 0 ? (
                                 <Text className="text-textLight text-center py-6">
-                                    No expenses yet
+                                    No settlements yet
                                 </Text>
                             ) : (
-                                expenses.map(item => (
-                                    <GroupExpenseItem key={item.id} item={item} />
-                                ))
+                                <View className="gap-2">
+                                    {settlements.map((item: any) => (
+                                        <GroupSettlementItem
+                                            key={item.id}
+                                            item={item.data}
+                                            currentUserId={user?.id ?? 0}
+                                        />
+                                    ))}
+                                </View>
                             )}
                         </View>
-                    </View>
+                    )}
                 </ScrollView>
 
                 <Pressable
