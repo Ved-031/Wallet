@@ -1,11 +1,11 @@
+import { useState } from "react";
 import { router } from "expo-router";
 import { IoniconName } from "@/types";
-import { useCallback, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/shared/constants/colors";
 import { Pressable, Text, View } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { CreateGroupSheet } from "@/features/groups/components/CreateGroupSheet";
+import CreateGroupModal from "@/features/groups/components/CreateGroupModal";
 
 type Props = {
     ref: React.RefObject<BottomSheet | null>;
@@ -54,12 +54,7 @@ const SheetItem = ({ icon, label, description, color, onPress }: SheetItem) => {
 }
 
 export const AddButtonSheet = ({ ref }: Props) => {
-    const bottomSheetRef = useRef<BottomSheet>(null);
-
-    const openBottomSheet = useCallback(() => {
-        ref.current?.close();
-        bottomSheetRef.current?.snapToIndex(0);
-    }, []);
+    const [showCreateGroup, setShowCreateGroup] = useState(false);
 
     const handlePress = (href?: any) => {
         ref.current?.close();
@@ -90,28 +85,34 @@ export const AddButtonSheet = ({ ref }: Props) => {
                     />
                     <View className="h-[0.4px] bg-border" />
                     <SheetItem
-                        label="Split bill"
-                        description="Split your bill with friends"
-                        icon="person-add-outline"
-                        onPress={() => handlePress('/groups/create-expense')}
-                    />
-                    <View className="h-[0.5px] bg-border" />
-                    <SheetItem
                         label="Create group"
                         description="Group with your friends"
                         icon="people-outline"
-                        onPress={openBottomSheet}
+                        onPress={() => {
+                            setShowCreateGroup(true);
+                            ref.current?.close();
+                        }}
                     />
                     <View className="h-[0.4px] bg-border" />
                     <SheetItem
-                        label="Settle up"
-                        description="Pay your debts"
-                        icon="swap-horizontal-outline"
-                        onPress={() => handlePress('/settlements/create')}
+                        label="Transfer to group"
+                        description="Share expenses with your friends"
+                        icon="share-outline"
+                        onPress={() => handlePress('/(tabs)/groups')}
+                    />
+                    <View className="h-[0.4px] bg-border" />
+                    <SheetItem
+                        label="Transaction history"
+                        description="See your transaction history"
+                        icon="time-outline"
+                        onPress={() => handlePress('/activity')}
                     />
                 </BottomSheetView>
             </BottomSheet>
-            <CreateGroupSheet bottomSheetRef={bottomSheetRef} />
+            <CreateGroupModal
+                visible={showCreateGroup}
+                onClose={() => setShowCreateGroup(false)}
+            />
         </>
     )
 };

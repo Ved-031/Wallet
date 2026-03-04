@@ -1,16 +1,11 @@
-import { useCallback, useRef } from 'react';
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import BottomSheet from '@gorhom/bottom-sheet';
+import CreateGroupModal from './CreateGroupModal';
 import { COLORS } from '@/shared/constants/colors';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { CreateGroupSheet } from './CreateGroupSheet';
 
 const NoGroupFound = () => {
-    const bottomSheetRef = useRef<BottomSheet>(null);
-
-    const openBottomSheet = useCallback(() => {
-        bottomSheetRef.current?.snapToIndex(0);
-    }, []);
+    const [showCreateGroup, setShowCreateGroup] = useState(false);
 
     return (
         <>
@@ -26,8 +21,7 @@ const NoGroupFound = () => {
                     Start tracking you finances with your firends
                 </Text>
                 <TouchableOpacity
-                    // onPress={() => router.push('/gropus/create')}
-                    onPress={openBottomSheet}
+                    onPress={() => setShowCreateGroup(true)}
                     className='flex-row items-center gap-2 bg-primary rounded-full px-4 py-[10px] shadow shadow-shadow mt-1'
                 >
                     <Ionicons
@@ -40,7 +34,10 @@ const NoGroupFound = () => {
                     </Text>
                 </TouchableOpacity>
             </View>
-            <CreateGroupSheet bottomSheetRef={bottomSheetRef} />
+            <CreateGroupModal
+                visible={showCreateGroup}
+                onClose={() => setShowCreateGroup(false)}
+            />
         </>
     );
 };

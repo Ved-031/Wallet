@@ -1,7 +1,5 @@
-import { useFocusEffect } from 'expo-router';
+import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import BottomSheet from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef } from 'react';
 import { COLORS } from '@/shared/constants/colors';
 import { InviteRaw } from '@/features/invites/types';
 import NoGroupFound from '@/features/groups/components/NoGroup';
@@ -9,28 +7,17 @@ import { mapInviteToUI } from '@/features/invites/mapInviteToUi';
 import { useInvites } from '@/features/invites/hooks/useInvites';
 import { GroupCard } from '@/features/groups/components/GroupCard';
 import { InviteCard } from '@/features/invites/components/InviteCard';
-import { CreateGroupSheet } from '@/features/groups/components/CreateGroupSheet';
+import CreateGroupModal from '@/features/groups/components/CreateGroupModal';
 import { useGetGroupsPreview } from '@/features/groups/hooks/useGetGroupsPreview';
 import { View, FlatList, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 
 const GroupsScreen = () => {
-    const bottomSheetRef = useRef<BottomSheet>(null);
     const { data: rawInvites } = useInvites();
     const { data, isLoading } = useGetGroupsPreview();
 
+    const [showCreateGroup, setShowCreateGroup] = React.useState(false);
+
     const invites = rawInvites?.map((inv: InviteRaw) => mapInviteToUI(inv));
-
-    const openBottomSheet = useCallback(() => {
-        bottomSheetRef.current?.snapToIndex(0);
-    }, []);
-
-    useFocusEffect(
-        useCallback(() => {
-            return () => {
-                bottomSheetRef.current?.close();
-            };
-        }, [])
-    );
 
     if (isLoading) {
         return (
@@ -62,7 +49,7 @@ const GroupsScreen = () => {
                         </Text>
                     </View>
                     <TouchableOpacity
-                        onPress={openBottomSheet}
+                        onPress={() => setShowCreateGroup(true)}
                         className='flex-row items-center gap-2 bg-primary rounded-full px-4 py-[10px] shadow shadow-shadow mt-1'
                     >
                         <Ionicons
@@ -99,7 +86,10 @@ const GroupsScreen = () => {
                     showsVerticalScrollIndicator={false}
                 />
             </View>
-            <CreateGroupSheet bottomSheetRef={bottomSheetRef} />
+            <CreateGroupModal
+                onClose={() => setShowCreateGroup(false)}
+                visible={showCreateGroup}
+            />
         </>
     );
 }

@@ -8,11 +8,11 @@ export const useCreateGroupExpense = (groupId: number) => {
         mutationFn: createGroupExpense,
 
         onMutate: async payload => {
-            await queryClient.cancelQueries({ queryKey: ['group-expenses', groupId] });
+            await queryClient.cancelQueries({ queryKey: ['group-activity', groupId] });
             await queryClient.cancelQueries({ queryKey: ['group-settlements', groupId] });
             await queryClient.cancelQueries({ queryKey: ['groups-preview'] });
 
-            const previousExpenses = queryClient.getQueryData<any>(['group-expenses', groupId]);
+            const previousExpenses = queryClient.getQueryData<any>(['group-activity', groupId]);
             const previousBalances = queryClient.getQueryData<any>(['group-settlements', groupId]);
             const previousPreview = queryClient.getQueryData<any>(['groups-preview']);
 
@@ -35,7 +35,7 @@ export const useCreateGroupExpense = (groupId: number) => {
 
             // ---------- UPDATE EXPENSE HISTORY ----------
             if (previousExpenses?.data) {
-                queryClient.setQueryData(['group-expenses', groupId], {
+                queryClient.setQueryData(['group-activity', groupId], {
                     ...previousExpenses,
                     data: [tempExpense, ...previousExpenses.data],
                 });
@@ -89,7 +89,7 @@ export const useCreateGroupExpense = (groupId: number) => {
 
         onError: (_err, _vars, ctx) => {
             if (ctx?.previousExpenses)
-                queryClient.setQueryData(['group-expenses', groupId], ctx.previousExpenses);
+                queryClient.setQueryData(['group-activity', groupId], ctx.previousExpenses);
 
             if (ctx?.previousBalances)
                 queryClient.setQueryData(['group-settlements', groupId], ctx.previousBalances);
@@ -99,7 +99,7 @@ export const useCreateGroupExpense = (groupId: number) => {
         },
 
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ['group-expenses', groupId] });
+            queryClient.invalidateQueries({ queryKey: ['group-activity', groupId] });
             queryClient.invalidateQueries({ queryKey: ['group-settlements', groupId] });
             queryClient.invalidateQueries({ queryKey: ['groups-preview'] });
         },

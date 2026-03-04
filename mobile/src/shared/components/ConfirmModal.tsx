@@ -50,16 +50,13 @@ export default function ConfirmModal({
                     <View className="bg-card rounded-3xl p-6 w-full border border-border">
 
                         {/* ICON */}
-                        <View className="items-center mb-4">
+                        <View className="items-center mb-2">
                             <View
                                 className={`w-14 h-14 rounded-full items-center justify-center ${isDanger ? 'bg-red-100' : 'bg-primary/10'
                                     }`}
                             >
                                 <Ionicons
-                                    name={icon ?? isDanger
-                                        ? 'warning-outline'
-                                        : 'help-circle-outline'
-                                    }
+                                    name={icon || isDanger ? 'warning-outline' : 'help-circle-outline'}
                                     size={26}
                                     color={
                                         isDanger

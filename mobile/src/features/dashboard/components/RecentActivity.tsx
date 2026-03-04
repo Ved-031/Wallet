@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import { ActivityItem } from "./ActivityItem";
+import { COLORS } from "@/shared/constants/colors";
 import { ActivityUI } from "@/features/activity/types";
 import EmptyState from "@/shared/components/EmptyState";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
@@ -13,7 +14,7 @@ export const RecentActivity = () => {
     if (isLoading) {
         return (
             <View className="py-6 items-center">
-                <ActivityIndicator />
+                <ActivityIndicator size={'small'} color={COLORS.primary} />
             </View>
         )
     }

@@ -19,16 +19,6 @@ const ACTIONS: Action[] = [
         onPress: () => router.push('/transactions/create'),
     },
     {
-        label: 'Split',
-        icon: 'people-outline',
-        onPress: () => router.push('/groups/create-expense'),
-    },
-    {
-        label: 'Settle',
-        icon: 'swap-horizontal-outline',
-        onPress: () => router.push('/settlements/create'),
-    },
-    {
         label: 'History',
         icon: 'time-outline',
         onPress: () => router.push('/activity'),
@@ -68,15 +58,9 @@ const ActionTile = ({ action }: { action: Action }) => {
 
 export const QuickActions = () => {
     return (
-        <View className="my-8">
-            <View className="flex-row gap-3">
-                <ActionTile action={ACTIONS[0]} />
-                <ActionTile action={ACTIONS[1]} />
-            </View>
-            <View className="flex-row gap-3 mt-3">
-                <ActionTile action={ACTIONS[2]} />
-                <ActionTile action={ACTIONS[3]} />
-            </View>
+        <View className="my-8 flex-row gap-3">
+            <ActionTile action={ACTIONS[0]} />
+            <ActionTile action={ACTIONS[1]} />
         </View>
     );
 };

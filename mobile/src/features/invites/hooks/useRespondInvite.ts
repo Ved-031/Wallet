@@ -29,6 +29,7 @@ export const useRespondInvite = () => {
         qc.invalidateQueries({ queryKey: ['groups-preview'] });
         qc.invalidateQueries({ queryKey: ['dashboard-groups'] });
         qc.invalidateQueries({ queryKey: ['group-invites'] });
+        qc.invalidateQueries({ queryKey: ['invites'] });
     };
 
     const accept = useMutation({

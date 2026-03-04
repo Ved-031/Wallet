@@ -7,7 +7,7 @@ type Props = {
     onChange: (value: ActivityFilter) => void;
 };
 
-const filters: ActivityFilter[] = ['ALL', 'PERSONAL', 'GROUP', 'SETTLEMENT'];
+const filters: ActivityFilter[] = ['ALL', 'PERSONAL', 'SETTLEMENT'];
 
 export const ActivityFilterTabs = ({ value, onChange }: Props) => {
     return (
@@ -34,9 +34,7 @@ export const ActivityFilterTabs = ({ value, onChange }: Props) => {
                                 ? 'All'
                                 : filter === 'PERSONAL'
                                     ? 'Personal'
-                                    : filter === 'GROUP'
-                                        ? 'Group'
-                                        : 'Settlement'
+                                    : 'Settlements'
                             }
                         </Text>
                     </Pressable>

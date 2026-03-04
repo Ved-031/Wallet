@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { COLORS } from '@/shared/constants/colors';
 import { GroupPreviewCard } from './GroupPreviewCard';
 import { useDashboardGroups } from '../hooks/useDashboardGroups';
 import { Text, View, FlatList, Pressable, ActivityIndicator } from 'react-native';
@@ -9,7 +10,7 @@ export const GroupsPreview = () => {
     if (isLoading) {
         return (
             <View className="flex-1 items-center justify-center bg-background">
-                <ActivityIndicator />
+                <ActivityIndicator size={'small'} color={COLORS.primary} />
                 <Text className="mt-4 text-text">Loading groups...</Text>
             </View>
         );
