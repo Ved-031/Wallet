@@ -53,6 +53,8 @@ export const settlementsRepository = {
                 id: true,
                 name: true,
                 avatar: true,
+                pushToken: true,
+                pushEnabled: true,
             },
         });
     },

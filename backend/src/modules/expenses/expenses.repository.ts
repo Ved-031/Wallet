@@ -37,6 +37,23 @@ export const expensesRepository = {
         });
     },
 
+    async getGroupMembersWithUser(groupId: number) {
+        return prisma.groupMember.findMany({
+            where: { groupId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar: true,
+                        pushToken: true,
+                        pushEnabled: true,
+                    },
+                },
+            },
+        });
+    },
+
     async getGroupExpenses(groupId: number, cursor?: Date, limit = 20) {
         return prisma.expense.findMany({
             where: {

@@ -80,8 +80,8 @@ export const invitesRepository = {
             where: { id: inviteId },
             include: {
                 group: { select: { id: true, name: true } },
-                inviter: { select: { id: true, name: true, email: true, avatar: true } },
                 invited: { select: { id: true, name: true, email: true, avatar: true } },
+                inviter: { select: { id: true, name: true, email: true, avatar: true, pushToken: true, pushEnabled: true } },
             },
         });
     },

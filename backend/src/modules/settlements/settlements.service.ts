@@ -1,5 +1,6 @@
 import { AppError } from '../../utils/AppError';
 import { NotificationType } from '@prisma/client';
+import { sendUserPush } from '../../utils/push/sendUserPush';
 import { settlementsRepository } from './settlements.repository';
 import { notificationsRepository } from '../notifications/notifications.repository';
 
@@ -35,13 +36,14 @@ export const settlementsService = {
         );
 
         const payer = await settlementsRepository.getUserBasic(paidBy);
+        const receiver = await settlementsRepository.getUserBasic(paidTo);
         const group = await settlementsRepository.getGroupBasic(groupId);
 
         await notificationsRepository.createNotification(
             paidTo,
             NotificationType.SETTLEMENT,
             'Settlement received',
-            'Settlement',
+            `${payer?.name} paid you ₹${amount}`,
             {
                 actorId: paidBy,
                 actorName: payer?.name,
@@ -49,8 +51,21 @@ export const settlementsService = {
                 amount,
                 groupId,
                 groupName: group?.name,
-            }
+            },
         );
+
+        if (receiver) {
+            await sendUserPush(
+                receiver,
+                'Settlement Received',
+                `${payer?.name} paid you ₹${amount} in ${group?.name}`,
+                {
+                    type: 'SETTLEMENT',
+                    groupId,
+                    amount,
+                },
+            );
+        }
 
         return settlement;
     },
@@ -65,7 +80,12 @@ export const settlementsService = {
         const limit = Math.min(Number(query.limit) || 20, 50);
         const cursor = query.cursor ? new Date(query.cursor) : undefined;
 
-        const settlements = await settlementsRepository.getGroupSettlements(groupId, currentUserId, cursor, limit);
+        const settlements = await settlementsRepository.getGroupSettlements(
+            groupId,
+            currentUserId,
+            cursor,
+            limit,
+        );
 
         const nextCursor =
             settlements.length === limit ? settlements[settlements.length - 1].createdAt : null;

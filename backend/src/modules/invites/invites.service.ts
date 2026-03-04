@@ -1,6 +1,7 @@
 import { AppError } from '../../utils/AppError';
 import { NotificationType } from '@prisma/client';
 import { invitesRepository } from './invites.repository';
+import { sendUserPush } from '../../utils/push/sendUserPush';
 
 export const invitesService = {
     async sendInvite(currentUserId: number, groupId: number, email: string) {
@@ -27,7 +28,7 @@ export const invitesService = {
         // create invite
         const invite = await invitesRepository.createInvite(groupId, currentUserId, invitedUser.id);
 
-        // notify invited user
+        // create notification in db
         await invitesRepository.createNotification(
             invitedUser.id,
             NotificationType.GROUP_INVITE,
@@ -37,6 +38,18 @@ export const invitesService = {
                 actorName: group.creator.name,
                 actorAvatar: group.creator.avatar,
                 groupName: group.name,
+                inviteId: invite.id,
+            },
+        );
+
+        // send push notification
+        await sendUserPush(
+            invitedUser,
+            'Group Invite',
+            `${group.creator.name} invited you to join ${group.name}`,
+            {
+                type: 'GROUP_INVITE',
+                groupId,
                 inviteId: invite.id,
             },
         );
@@ -71,6 +84,16 @@ export const invitesService = {
             },
         );
 
+        await sendUserPush(
+            invite.inviter,
+            'Invite Accepted',
+            `${invite.invited.name} joined ${invite.group.name}`,
+            {
+                type: 'INVITE_ACCEPTED',
+                groupId: invite.group.id,
+            },
+        );
+
         return accepted;
     },
 
@@ -94,6 +117,16 @@ export const invitesService = {
                 actorName: invite.invited.name,
                 actorAvatar: invite.invited.avatar,
                 groupName: invite.group.name,
+            },
+        );
+
+        await sendUserPush(
+            invite.inviter,
+            'Invite Declined',
+            `${invite.invited.name} declined your invite to ${invite.group.name}`,
+            {
+                type: 'INVITE_DECLINED',
+                groupId: invite.group.id,
             },
         );
 

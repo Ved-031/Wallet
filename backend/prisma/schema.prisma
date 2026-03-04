@@ -12,6 +12,8 @@ model User {
     email               String               @unique
     name                String?
     avatar              String?
+    pushToken           String?
+    pushEnabled         Boolean              @default(true)
     transactions        Transaction[]
     groupsCreated       Group[]              @relation("GroupCreator")
     groupMembers        GroupMember[]
@@ -49,16 +51,16 @@ model Transaction {
 }
 
 model Group {
-    id            Int            @id @default(autoincrement())
-    name          String
-    createdBy     Int
-    creator       User           @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
-    members       GroupMember[]
-    expenses      Expense[]
-    settlements   Settlement[]
-    invites       GroupInvite[]
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
+    id          Int           @id @default(autoincrement())
+    name        String
+    createdBy   Int
+    creator     User          @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+    members     GroupMember[]
+    expenses    Expense[]
+    settlements Settlement[]
+    invites     GroupInvite[]
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
 }
 
 enum GroupRole {
@@ -156,6 +158,9 @@ enum NotificationType {
     INVITE_ACCEPTED
     INVITE_DECLINED
     SETTLEMENT
+    EXPENSE_ADDED
+    GROUP_RENAMED
+    MEMBER_REMOVED
 }
 
 model IdempotencyKey {

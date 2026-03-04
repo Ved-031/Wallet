@@ -1,5 +1,8 @@
 import { AppError } from '../../utils/AppError';
+import { NotificationType } from '@prisma/client';
 import { expensesRepository } from './expenses.repository';
+import { sendUserPush } from '../../utils/push/sendUserPush';
+import { notificationsRepository } from '../notifications/notifications.repository';
 
 type SplitInput = {
     userId: number;
@@ -22,7 +25,7 @@ export const expensesService = {
 
         if (!splits || splits.length === 0) throw new AppError('Splits required', 400);
 
-        // 1️⃣ get group members
+        // get group members
         const members = await expensesRepository.getGroupMembers(groupId);
         const memberIds = new Set(members.map(m => m.userId));
 
@@ -33,32 +36,74 @@ export const expensesService = {
         // payer must be member
         if (!memberIds.has(paidBy)) throw new AppError('Payer not in group', 400);
 
-        // 2️⃣ validate split users
+        // validate split users
         for (const s of splits) {
             if (!memberIds.has(s.userId)) throw new AppError(`User ${s.userId} not in group`, 400);
         }
 
-        // 3️⃣ validate total
+        // validate total
         const totalSplit = splits.reduce((sum, s) => sum + s.amount, 0);
 
         if (Number(totalSplit.toFixed(2)) !== Number(amount.toFixed(2)))
             throw new AppError('Split amounts must equal total expense', 400);
 
-        // 4️⃣ prepare participants
+        // prepare participants
         const participants = splits.map(s => ({
             userId: s.userId,
             share: s.amount,
             paidShare: s.userId === paidBy ? amount : 0,
         }));
 
-        // 5️⃣ save
-        return expensesRepository.createExpense(
+        // save
+        const expense = await expensesRepository.createExpense(
             groupId,
             paidBy,
             description.trim(),
             amount,
             participants,
         );
+
+        // get group members with user data
+        const groupMembers = await expensesRepository.getGroupMembersWithUser(groupId);
+
+        // payer info
+        const payer = groupMembers.find(m => m.userId === paidBy)?.user;
+
+        // notify everyone except payer
+        for (const member of groupMembers) {
+            if (member.userId === paidBy) continue;
+
+            const user = member.user;
+
+            // create DB notification
+            await notificationsRepository.createNotification(
+                user.id,
+                NotificationType.EXPENSE_ADDED,
+                `${payer?.name} added an expense`,
+                description,
+                {
+                    actorName: payer?.name,
+                    actorAvatar: payer?.avatar,
+                    groupId,
+                    expenseId: expense.id,
+                    amount,
+                },
+            );
+
+            // send push
+            await sendUserPush(
+                user,
+                'New Expense Added',
+                `${payer?.name} added ₹${amount} in the group`,
+                {
+                    type: 'EXPENSE_ADDED',
+                    groupId,
+                    expenseId: expense.id,
+                },
+            );
+        }
+
+        return expense;
     },
 
     async getGroupExpenses(currentUserId: number, groupId: number, query: any) {

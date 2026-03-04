@@ -52,4 +52,25 @@ export const notificationsRepository = {
             data: { read: true },
         });
     },
+
+    async savePushToken(userId: number, token: string) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: { pushToken: token },
+        });
+    },
+
+    async removePushToken(userId: number) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: { pushToken: null },
+        });
+    },
+
+    async updatePushPreference(userId: number, enabled: boolean) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: { pushEnabled: enabled },
+        });
+    },
 };
