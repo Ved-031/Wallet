@@ -6,10 +6,10 @@ import {
     Pressable,
     ActivityIndicator,
 } from 'react-native';
+import { IoniconName } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/shared/constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { IoniconName } from '@/types';
 
 type Props = {
     visible: boolean;

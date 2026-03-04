@@ -4,7 +4,7 @@ import { COLORS } from '@/shared/constants/colors';
 import { useClerk, useUser } from '@clerk/clerk-expo';
 import { useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { View, Text, Image, Switch, Alert, Pressable } from 'react-native';
+import { View, Text, Image, Switch, Alert, Pressable, ScrollView } from 'react-native';
 
 const ProfileScreen = () => {
     const router = useRouter();
@@ -30,7 +30,15 @@ const ProfileScreen = () => {
     };
 
     return (
-        <View className='flex-1 bg-background px-5 items-center justify-center'>
+        <ScrollView
+            contentContainerStyle={{
+                backgroundColor: COLORS.background,
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 20,
+            }}
+        >
             {/* USER AVATAR */}
             <View className='items-center gap-3 relative'>
                 <Image
@@ -142,21 +150,6 @@ const ProfileScreen = () => {
                         color={COLORS.text}
                     />
                 </Pressable>
-
-                <View className='h-[0.4px] w-full bg-border' />
-
-                {/* THEME */}
-                <View className='flex-row items-center justify-between'>
-                    <View className='flex-row items-center gap-2'>
-                        <Ionicons
-                            name='sunny-outline'
-                            size={18}
-                            color={COLORS.textLight}
-                        />
-                        <Text className='text-textLight font-medium text-[16px]'>Theme</Text>
-                    </View>
-                    <Text className='text-text font-medium'>Light</Text>
-                </View>
             </View>
 
             <View className='bg-card rounded-3xl px-5 py-6 shadow-sm w-full mb-5 gap-5'>
@@ -241,7 +234,7 @@ const ProfileScreen = () => {
                     />
                 </Pressable>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 

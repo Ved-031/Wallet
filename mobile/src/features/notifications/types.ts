@@ -16,5 +16,7 @@ export type Notification = {
         actorAvatar?: string;
         groupName?: string;
         inviteId?: number;
+        amount?: number;
+        groupId?: number;
     };
 };

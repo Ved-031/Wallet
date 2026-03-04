@@ -62,7 +62,7 @@ export default function ActivityScreen() {
     if (isLoading) {
         return (
             <View className="flex-1 bg-background items-center justify-center">
-                <ActivityIndicator />
+                <ActivityIndicator size={'large'} color={COLORS.primary} />
             </View>
         );
     }

@@ -21,7 +21,7 @@ const buildMessage = (item: Notification) => {
             return `${meta.actorName ?? "Someone"} declined your invite to ${meta.groupName ?? ""}`;
 
         case "SETTLEMENT":
-            return item.message;
+            return `${item.meta?.actorName} paid you ₹${item.meta?.amount} in ${item.meta?.groupName}`;
 
         default:
             return item.message;
