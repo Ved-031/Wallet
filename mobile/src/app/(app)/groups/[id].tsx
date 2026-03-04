@@ -177,6 +177,7 @@ export default function GroupDetailsScreen() {
             </View>
             <GroupActionSheet
                 groupId={groupId}
+                groupName={group.name}
                 isAdmin={isAdmin}
                 bottomSheetRef={bottomSheetRef}
                 setLeaveGroupError={setLeaveGroupError}

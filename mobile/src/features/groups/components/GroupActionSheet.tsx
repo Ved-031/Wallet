@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { router } from 'expo-router';
 import { cn } from '@/shared/utils/cn';
 import { Ionicons } from '@expo/vector-icons';
+import RenameGroupModal from './RenameGroupModal';
 import { COLORS } from '@/shared/constants/colors';
 import { useLeaveGroup } from '../hooks/useLeaveGroup';
 import { useDeleteGroup } from '../hooks/useDeleteGroup';
@@ -13,6 +14,7 @@ import InviteMemberModal from '@/features/invites/components/InviteMemberModal';
 
 type Props = {
     groupId: number;
+    groupName: string;
     isAdmin: boolean;
     setLeaveGroupError: (msg: string) => void;
     setDeleteGroupError: (msg: string) => void;
@@ -65,12 +67,11 @@ const SheetSection = ({ title }: { title: string }) => {
     );
 };
 
-const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroupError, bottomSheetRef }: Props) => {
+const GroupActionSheet = ({ groupId, groupName, isAdmin, setLeaveGroupError, setDeleteGroupError, bottomSheetRef }: Props) => {
     const [confirmLeave, setConfirmLeave] = React.useState(false);
     const [confirmDelete, setConfirmDelete] = React.useState(false);
+    const [renameVisible, setRenameVisible] = React.useState(false);
     const [showInviteModal, setShowInviteModal] = React.useState(false);
-
-    const inviteSheetRef = useRef<BottomSheet>(null);
 
     const leaveMutation = useLeaveGroup();
     const deleteMutation = useDeleteGroup();
@@ -145,7 +146,10 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
                             <SheetActionItem
                                 icon='create-outline'
                                 label='Rename group'
-                                onPress={() => { }}
+                                onPress={() => {
+                                    setRenameVisible(true);
+                                    bottomSheetRef.current?.close();
+                                }}
                             />
 
                             {/* DANGER ZONE */}
@@ -181,6 +185,12 @@ const GroupActionSheet = ({ groupId, isAdmin, setLeaveGroupError, setDeleteGroup
                 visible={showInviteModal}
                 groupId={groupId}
                 onClose={() => setShowInviteModal(false)}
+            />
+            <RenameGroupModal
+                visible={renameVisible}
+                onClose={() => setRenameVisible(false)}
+                groupId={groupId}
+                currentName={groupName}
             />
             {isAdmin ? (
                 <ConfirmModal

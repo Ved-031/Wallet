@@ -171,7 +171,7 @@ const ProfileScreen = () => {
                         />
                     </Pressable>
 
-                    <View className='h-[0.5px] w-full bg-border' />
+                    <View className='h-[0.4px] w-full bg-border' />
 
                     {/* ABOUT */}
                     <Pressable onPress={() => router.push('/about-us')} className='flex-row items-center justify-between'>

@@ -44,6 +44,15 @@ export default function HelpSupportScreen() {
                         Yes. All authentication and password management is handled securely.
                     </Text>
                 </View>
+
+                <View>
+                    <Text className="text-text font-medium">
+                        Q3. Is my data secure?
+                    </Text>
+                    <Text className="text-textLight mt-1">
+                        Yes. All authentication and password management is handled securely.
+                    </Text>
+                </View>
             </View>
 
             {/* CONTACT CARD */}

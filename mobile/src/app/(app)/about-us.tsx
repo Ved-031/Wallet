@@ -37,7 +37,7 @@ export default function AboutScreen() {
                     contentFit="contain"
                 />
                 <Text className="text-text text-2xl font-bold">
-                    Split Wallet
+                    Wallet
                 </Text>
                 <Text className="text-textLight mt-1">Version 1.0.0</Text>
             </View>
@@ -48,7 +48,7 @@ export default function AboutScreen() {
                     Why this app exists
                 </Text>
                 <Text className="text-text leading-6">
-                    Split Wallet is built to remove awkward conversations about money.
+                    Wallet is built to remove awkward conversations about money.
                     Whether you're traveling with friends, living with roommates, or
                     managing group expenses, the app keeps everything transparent and fair.
                     No manual calculations. No confusion. No forgotten payments.
