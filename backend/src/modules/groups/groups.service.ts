@@ -11,6 +11,20 @@ export const groupService = {
         return groupRepository.createGroup(name.trim(), userId);
     },
 
+    async renameGroup(userId: number, groupId: number, name: string) {
+        if (!name || name.trim().length < 2) {
+            throw new AppError('Group name must be at least 2 characters', 400);
+        }
+
+        const group = await groupRepository.findGroupById(groupId);
+        if (!group) throw new AppError('Group not found', 404);
+
+        const me = group.members.find(m => m.userId === userId);
+        if (!me || me.role !== 'ADMIN') throw new AppError('Only admin can rename group', 403);
+
+        return groupRepository.renameGroup(name.trim(), groupId);
+    },
+
     async getUserGroups(userId: number) {
         const memberships = await groupRepository.findUserGroups(userId);
 

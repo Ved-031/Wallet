@@ -6,15 +6,15 @@ import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 
 /**
  * @swagger
- * /transactions/summary:
- *   get:
- *     summary: Get income expense summary
- *     tags: [Transactions]
+ * /groups:
+ *   post:
+ *     summary: Create a new group
+ *     tags: [Groups]
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       200:
- *         description: Summary retrieved
+ *       201:
+ *         description: Group created
  */
 export const createGroup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.id;
@@ -23,6 +23,33 @@ export const createGroup = asyncHandler(async (req: AuthenticatedRequest, res: R
     const group = await groupService.createGroup(userId, name);
 
     res.status(201).json(
+        new ApiResponse({
+            success: true,
+            data: group,
+        }),
+    );
+});
+
+/**
+ * @swagger
+ * /groups/{groupId}:
+ *   put:
+ *     summary: Rename a group
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Group renamed
+ */
+export const renameGroup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.id;
+    const { name } = req.body;
+    const groupId = Number(req.params.groupId);
+
+    const group = await groupService.renameGroup(userId, groupId, name);
+
+    res.status(200).json(
         new ApiResponse({
             success: true,
             data: group,

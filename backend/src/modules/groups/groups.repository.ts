@@ -20,6 +20,13 @@ export const groupRepository = {
         });
     },
 
+    async renameGroup(name: string, groupId: number) {
+        return prisma.group.update({
+            where: { id: groupId },
+            data: { name },
+        });
+    },
+
     async findUserGroups(userId: number) {
         return prisma.groupMember.findMany({
             where: { userId },

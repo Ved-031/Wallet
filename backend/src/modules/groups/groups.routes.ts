@@ -7,7 +7,8 @@ import {
     leaveGroup,
     removeMember,
     deleteGroup,
-    getGroupActivity
+    getGroupActivity,
+    renameGroup
 } from './groups.controller';
 
 const router = Router();
@@ -17,6 +18,7 @@ router.use(protectRoute);
 router.post('/', createGroup);
 router.get('/', getMyGroups);
 router.get('/:id', getGroupDetails);
+router.put('/:groupId', renameGroup);
 router.delete('/:groupId', deleteGroup);
 router.post('/:groupId/leave', leaveGroup);
 router.get('/:groupId/activity', getGroupActivity);
