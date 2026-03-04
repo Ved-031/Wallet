@@ -30,10 +30,7 @@ export const settlementsRepository = {
         return prisma.settlement.findMany({
             where: {
                 groupId,
-                OR: [
-                    { paidBy: currentUserId },
-                    { paidTo: currentUserId },
-                ],
+                OR: [{ paidBy: currentUserId }, { paidTo: currentUserId }],
                 ...(cursor && {
                     createdAt: {
                         lt: cursor,
@@ -45,6 +42,27 @@ export const settlementsRepository = {
             include: {
                 payer: { select: { id: true, name: true, avatar: true } },
                 receiver: { select: { id: true, name: true, avatar: true } },
+            },
+        });
+    },
+
+    async getUserBasic(userId: number) {
+        return prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                avatar: true,
+            },
+        });
+    },
+
+    async getGroupBasic(groupId: number) {
+        return prisma.group.findUnique({
+            where: { id: groupId },
+            select: {
+                id: true,
+                name: true,
             },
         });
     },

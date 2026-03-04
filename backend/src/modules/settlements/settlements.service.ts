@@ -1,5 +1,7 @@
 import { AppError } from '../../utils/AppError';
+import { NotificationType } from '@prisma/client';
 import { settlementsRepository } from './settlements.repository';
+import { notificationsRepository } from '../notifications/notifications.repository';
 
 export const settlementsService = {
     async createSettlement(
@@ -24,13 +26,33 @@ export const settlementsService = {
         if (!memberIds.has(paidBy) || !memberIds.has(paidTo))
             throw new AppError('Users must belong to group', 400);
 
-        return settlementsRepository.createSettlement(
+        const settlement = await settlementsRepository.createSettlement(
             groupId,
             paidBy,
             paidTo,
             amount,
             note?.trim(),
         );
+
+        const payer = await settlementsRepository.getUserBasic(paidBy);
+        const group = await settlementsRepository.getGroupBasic(groupId);
+
+        await notificationsRepository.createNotification(
+            paidTo,
+            NotificationType.SETTLEMENT,
+            'Settlement received',
+            'Settlement',
+            {
+                actorId: paidBy,
+                actorName: payer?.name,
+                actorAvatar: payer?.avatar,
+                amount,
+                groupId,
+                groupName: group?.name,
+            }
+        );
+
+        return settlement;
     },
 
     async getGroupSettlements(currentUserId: number, groupId: number, query: any) {
