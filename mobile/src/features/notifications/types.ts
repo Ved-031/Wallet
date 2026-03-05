@@ -2,7 +2,10 @@ export type NotificationType =
     | 'GROUP_INVITE'
     | 'INVITE_ACCEPTED'
     | 'INVITE_DECLINED'
-    | 'SETTLEMENT';
+    | 'SETTLEMENT'
+    | 'EXPENSE_ADDED'
+    | 'GROUP_RENAMED'
+    | 'MEMBER_REMOVED';
 
 export type Notification = {
     id: number;

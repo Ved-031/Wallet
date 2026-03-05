@@ -70,7 +70,6 @@ export const useCreateExpense = () => {
             queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard-activity'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard-groups'] });
-            // invalidateDashboard(queryClient);
         },
     });
 };
