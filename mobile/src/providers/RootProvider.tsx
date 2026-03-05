@@ -9,7 +9,6 @@ import { ActivityIndicator, View } from 'react-native';
 import SafeScreen from '@/shared/components/SafeScreen';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { QueryProvider } from '@/core/query/QueryProvider';
-import { useAppRefresh } from '@/shared/hooks/useAppRefresh';
 import PushRegistrationProvider from './PushRegistrationProvider';
 import AppErrorBoundary from '@/shared/components/AppErrorBoundary';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -29,9 +28,6 @@ type Props = PropsWithChildren;
 
 export default function RootProviders({ children }: Props) {
     const router = useRouter();
-    const { readOne } = useReadNotification();
-
-    useAppRefresh();
 
     useEffect(() => {
         const subscription = Notifications.addNotificationResponseReceivedListener(
@@ -41,10 +37,6 @@ export default function RootProviders({ children }: Props) {
                 if (!data) return;
 
                 const { type, groupId, notificationId } = data;
-
-                if (notificationId) {
-                    readOne.mutate(notificationId);
-                }
 
                 if (type === 'GROUP_INVITE') {
                     router.push(`/(app)/(tabs)/groups`);

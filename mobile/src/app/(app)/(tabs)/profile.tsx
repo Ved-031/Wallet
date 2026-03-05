@@ -5,13 +5,17 @@ import { useClerk, useUser } from '@clerk/clerk-expo';
 import { useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { View, Text, Image, Switch, Pressable, ScrollView } from 'react-native';
+import { useUpdatePushPreference } from '@/features/notifications/hooks/useUpdatePushPreference';
 
 const ProfileScreen = () => {
     const router = useRouter();
     const { user } = useUser();
     const { signOut } = useClerk();
     const queryClient = useQueryClient();
+    const { data: me } = useCurrentUser();
+    const updatePushPreference = useUpdatePushPreference();
 
     const [showLogoutAlert, setShowLogoutAlert] = React.useState(false);
 
@@ -121,8 +125,11 @@ const ProfileScreen = () => {
                             <Text className='text-textLight font-medium text-[16px]'>Notifications</Text>
                         </View>
                         <Switch
-                            value={false}
-                            onValueChange={(value) => console.log(value)}
+                            value={me?.pushEnabled ?? true}
+                            onValueChange={(value) => {
+                                updatePushPreference.mutate(value);
+                            }}
+                            disabled={updatePushPreference.isPending}
                             trackColor={{ false: COLORS.border, true: COLORS.primary }}
                             thumbColor={COLORS.text}
                             onTouchStart={(e) => e.stopPropagation()}
@@ -130,6 +137,7 @@ const ProfileScreen = () => {
                                 width: 40,
                                 height: 20,
                             }}
+                            className='disabled:opacity-50'
                         />
                     </View>
 

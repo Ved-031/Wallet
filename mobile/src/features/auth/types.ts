@@ -4,6 +4,8 @@ export type User = {
     name: string | null;
     email: string;
     avatar: string | null;
+    pushToken: string | null;
+    pushEnabled: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
