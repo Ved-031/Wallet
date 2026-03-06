@@ -7,10 +7,11 @@ export default function PushRegistrationProvider({ children }: any) {
 
     useEffect(() => {
         const initPush = async () => {
-            const token = await registerPushToken();
-
-            if (token) {
-                registerPush.mutate(token);
+            try {
+                const token = await registerPushToken();
+                if (token) registerPush.mutate(token);
+            } catch (error) {
+                console.log('Push init failed', error);
             }
         };
 

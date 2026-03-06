@@ -12,7 +12,6 @@ import { QueryProvider } from '@/core/query/QueryProvider';
 import PushRegistrationProvider from './PushRegistrationProvider';
 import AppErrorBoundary from '@/shared/components/AppErrorBoundary';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useReadNotification } from '@/features/notifications/hooks/useReadNotification';
 import { ActivitySheetProvider } from '@/features/activity/context/ActivitySheetContext';
 import {
     Inter_400Regular,
@@ -73,7 +72,7 @@ export default function RootProviders({ children }: Props) {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <ClerkProvider
                 tokenCache={tokenCache}
-                publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+                publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? ""}
             >
                 <AppErrorBoundary>
                     <QueryProvider>
