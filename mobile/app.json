@@ -8,6 +8,7 @@
         "scheme": "wallet",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
+        "assetBundlePatterns": ["**/*"],
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.vedtellawar.wallet",
