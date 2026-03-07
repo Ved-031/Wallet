@@ -1,8 +1,8 @@
 import { COLORS } from "@/shared/constants/colors";
-import { View, Text, FlatList, ActivityIndicator, Pressable } from "react-native";
 import { NotificationCard } from "@/features/notifications/components/NotificationCard";
 import { useReadNotification } from "@/features/notifications/hooks/useReadNotification";
 import { useGetNotifications } from "@/features/notifications/hooks/useGetNotifications";
+import { View, Text, FlatList, ActivityIndicator, Pressable, ScrollView } from "react-native";
 
 export default function NotificationsScreen() {
     const { readAll } = useReadNotification();
@@ -39,13 +39,16 @@ export default function NotificationsScreen() {
                 </Pressable>
             </View>
 
-            <View className="mt-5">
+            <ScrollView
+                className="mt-5 pb-5"
+                showsVerticalScrollIndicator={false}
+            >
                 <FlatList
                     data={data}
                     keyExtractor={(item) => String(item.id)}
                     renderItem={({ item }) => <NotificationCard item={item} />}
                 />
-            </View>
+            </ScrollView>
         </View>
     );
 }
